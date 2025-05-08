@@ -328,6 +328,13 @@ When contributing:
 - Include tests for both individual components and integrated functionality
 - Follow the respective language's stylistic conventions
 
+## Acknowledgements
+
+This project is an extension of the original AIDE R package and builds upon its foundational work. We would like to express our sincere gratitude to the original author for their significant contributions to the field of AI-assisted data extraction.
+
+-   **Original AIDE Project:** [https://github.com/noah-schroeder/AIDE](https://github.com/noah-schroeder/AIDE)
+-   **Author:** Noah Schroeder ([https://github.com/noah-schroeder](https://github.com/noah-schroeder))
+
 ## License
 
 This extension is licensed under the GNU General Public License v3.0 (GPL-3.0), the same license as the core AIDE package.
