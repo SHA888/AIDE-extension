@@ -1,0 +1,592 @@
+<context>
+# Overview  
+The AIDE-extension is a polyglot enhancement to the core AI-assisted Data Extraction (AIDE) R package, developed originally by Noah Schroeder. This extension integrates Python and Rust components to create a more powerful and versatile document processing and data extraction system focused specifically on scientific literature and healthcare data.
+
+The extension addresses several key problems:
+1. Limited AI/ML capabilities in native R for complex document understanding
+2. Performance bottlenecks in processing large documents and datasets
+3. Healthcare-specific data extraction requirements (e.g., FHIR compliance)
+4. Complex document format handling beyond basic PDF text extraction
+
+AIDE-extension is targeted at:
+- Data scientists working with healthcare documentation
+- Researchers conducting systematic reviews and meta-analyses of clinical literature
+- Healthcare IT professionals building data pipelines from unstructured documents
+- Organizations needing to extract structured data from clinical notes and EHRs
+
+The value proposition of AIDE-extension lies in its unique combination of:
+- R's statistical and data visualization strengths
+- Python's rich AI/ML ecosystem
+- Rust's performance benefits for computation-intensive operations
+- Healthcare interoperability through FHIR and clinical terminology standards
+
+# Core Features  
+## 1. Enhanced Document Processing
+- **What**: Multi-format document handling (PDF, DOCX, HTML, images) with advanced extraction capabilities for tables, structure, images, and text embedded in figures.
+- **Why**: Core AIDE is limited to basic PDF text extraction; healthcare documents often contain complex structures, tables, and embedded information that require specialized extraction techniques.
+- **How**: Leverages Python libraries like `pymupdf` for enhanced extraction, implements OCR capabilities via Tesseract/`pytesseract` for image-based text, and uses intelligent document chunking for handling large documents.
+
+## 2. Advanced AI/ML Integration
+- **What**: Implements named entity recognition for domain-specific entities, document layout analysis, semantic chunking, summarization, and confidence scoring for extracted data.
+- **Why**: Healthcare documents contain specialized terminology and structures that benefit from AI/ML approaches; understanding document layout and structure improves extraction accuracy.
+- **How**: Integrates with Python's NLP libraries (e.g., spaCy, Hugging Face transformers) for entity recognition and document understanding, implements healthcare-specific NER models, and creates APIs for R to access these capabilities.
+
+## 3. Healthcare Data Extraction (FHIR)
+- **What**: Specialized capabilities for medical document structure recognition, extraction to FHIR-compliant formats, validation against FHIR standards, and healthcare-specific entity recognition.
+- **Why**: Healthcare data interoperability requires FHIR compliance; extracting data in standardized formats enables integration with existing healthcare IT systems.
+- **How**: Implements FHIR resource mapping, integrates with healthcare terminologies (SNOMED CT, LOINC, ICD-10/11, RxNorm), and creates validation mechanisms for extracted data.
+
+## 4. Performance Optimization via Rust
+- **What**: High-performance document parsing, parallel processing of document components, memory-efficient handling of large documents, and accelerated OCR processing.
+- **Why**: Processing large volumes of healthcare documents requires optimized performance; memory efficiency is critical when handling large documents or batches.
+- **How**: Identifies computational bottlenecks and implements critical components in Rust, creates Python bindings for Rust code using PyO3/Maturin, and optimizes memory usage for large-scale processing.
+
+## 5. R Integration via reticulate
+- **What**: Seamless bridge between R and Python/Rust components, including Python session management, type conversion, data marshaling, error handling, and configuration management.
+- **Why**: Maintains compatibility with the core AIDE R package while extending capabilities; allows R users to leverage Python/Rust capabilities without leaving their preferred environment.
+- **How**: Uses `reticulate` to create R wrappers for Python functions, implements robust error handling and type conversion, and manages Python environments from R.
+
+# User Experience  
+## User Personas
+
+### Dr. Sarah Chen - Clinical Researcher
+- **Background**: PhD in Epidemiology, working on systematic reviews of clinical trials
+- **Goals**: Extract structured data from hundreds of research papers for meta-analysis
+- **Challenges**: Manual extraction is time-consuming and error-prone; needs to standardize data across different paper formats
+- **Needs from AIDE-extension**: Reliable extraction of study parameters, patient populations, results, and statistical measures with minimal manual intervention
+
+### David Kim - Healthcare Data Scientist
+- **Background**: MS in Data Science, working at a healthcare analytics company
+- **Goals**: Build predictive models from clinical documentation and integrate with existing EHR systems
+- **Challenges**: Needs to extract and normalize healthcare terminology; handling unstructured clinical notes
+- **Needs from AIDE-extension**: FHIR-compliant data extraction, healthcare entity recognition, integration with terminology standards
+
+### Emily Rodriguez - Health System IT Architect
+- **Background**: Computer Science background, 10 years in healthcare IT
+- **Goals**: Streamline data flow from documents into clinical decision support systems
+- **Challenges**: Interoperability between document sources and healthcare systems; performance at scale
+- **Needs from AIDE-extension**: High-performance processing, FHIR compliance, reliable extraction of clinical indicators
+
+## Key User Flows
+
+### Scientific Literature Extraction Flow
+1. User imports PDF research papers into R environment
+2. User configures extraction parameters (entities to extract, confidence thresholds)
+3. AIDE-extension pre-processes documents (OCR if needed, structure analysis)
+4. User selects extraction templates for specific paper types (RCT, observational study, etc.)
+5. System extracts structured data using AI/ML components
+6. User reviews extraction results with confidence scores
+7. User exports standardized data for meta-analysis
+
+### Clinical Document Processing Flow
+1. User connects to document source (EHR export, document repository)
+2. User selects document types and processing parameters
+3. System batch processes documents with optimized Rust components
+4. System extracts FHIR-compliant resources from documents
+5. User validates extraction against terminology standards
+6. System integrates extracted data with healthcare systems via FHIR API
+7. User analyzes extraction statistics and handles exceptions
+
+### Development Extension Flow
+1. Developer identifies new extraction need or enhancement
+2. Developer implements new component in appropriate language (R, Python, or Rust)
+3. Developer creates/updates bridge code for cross-language communication
+4. Developer tests component with sample documents
+5. Developer integrates component into main workflow
+6. Developer documents new capability in consistent format
+
+## UI/UX Considerations
+- Maintain consistency with core AIDE R package UI patterns
+- Provide clear visualization of extraction confidence and uncertainty
+- Implement progress tracking for long-running operations (large document batches)
+- Create intuitive visualization for document structure analysis
+- Design clear error messages with actionable information
+- Provide extension-specific configuration UI within R
+- Implement result comparison views (R vs. Python extraction methods)
+</context>
+<PRD>
+# Technical Architecture  
+
+## System Components
+
+### 1. R Components (Extension Bridge)
+- **R Wrappers**: Interface layer that exposes Python and Rust functionality to R users
+  - Function wrappers that match core AIDE API patterns
+  - Type conversion utilities for R-Python data exchange
+  - Configuration management for Python environment
+- **Data Conversion Layer**: Handles transformation between R, Python, and Rust data structures
+  - DataFrame/Tibble conversion
+  - JSON serialization/deserialization
+  - FHIR resource mapping
+- **UI Extensions**: Enhances AIDE UI with extension-specific components
+  - Progress tracking for long-running operations
+  - Visualization for document structure
+  - Result comparison views
+
+### 2. Python Components
+- **Document Processors**: Enhanced document handling capabilities
+  - Multi-format document parser (PDF, DOCX, HTML, images)
+  - Table extraction and structure analysis
+  - Image-based text extraction via OCR
+  - Document chunking and segmentation
+- **AI/ML Models**: Advanced text and document understanding
+  - Named Entity Recognition for healthcare/scientific entities
+  - Document layout analysis
+  - Semantic chunking and summarization
+  - Confidence scoring models
+- **Healthcare Data (FHIR)**: Healthcare-specific data handling
+  - FHIR resource extraction and validation
+  - Terminology mapping (SNOMED, LOINC, ICD, RxNorm)
+  - Clinical document structure recognition
+
+### 3. Rust Components
+- **High-Performance Parsing**: Optimized document processing
+  - Fast tokenization and parsing
+  - Parallel document component processing
+  - Memory-efficient document handling
+- **OCR Processing**: Accelerated image-to-text conversion
+  - Optimized Tesseract integration
+  - Image preprocessing pipeline
+  - Concurrent OCR processing
+- **FHIR SDK**: Healthcare data validation and handling
+  - FHIR schema validation
+  - Resource generation and transformation
+  - Healthcare data normalization
+
+### 4. External Integrations
+- **RustEMR**: Integration with Rust-based EMR system
+  - Bidirectional data flow
+  - FHIR-compliant interfaces
+  - Patient data contextualization
+- **Jamliquor**: Leveraging healthcare data processing tools
+  - Text processing components
+  - Healthcare-specific extraction patterns
+  - Document structure analysis
+
+## Data Models
+
+### Document Data Model
+- **DocumentMetadata**: Basic information about documents
+  - `id`: Unique identifier
+  - `title`: Document title
+  - `authors`: List of authors
+  - `publication_date`: Publication date
+  - `source`: Document source
+  - `format`: Document format
+  - `processing_status`: Current processing status
+
+- **DocumentStructure**: Hierarchical document representation
+  - `sections`: List of document sections
+  - `tables`: List of tables with structure and content
+  - `figures`: List of figures with extracted text
+  - `references`: Bibliography entries
+  - `metadata`: Document metadata
+
+- **ExtractionResult**: Output of extraction process
+  - `entity_mentions`: Extracted entities with position and confidence
+  - `relations`: Relationships between entities
+  - `structured_data`: Extracted structured information
+  - `fhir_resources`: Generated FHIR resources
+  - `confidence_scores`: Quality metrics for extraction
+  - `validation_issues`: Any problems identified during validation
+
+### Healthcare Data Models
+- **FHIRResources**: Standard FHIR resource types
+  - Patient
+  - Condition
+  - Observation
+  - MedicationStatement
+  - Procedure
+  - DiagnosticReport
+  - DocumentReference
+
+- **ClinicalConcepts**: Domain-specific clinical entities
+  - `medications`: Drug names, dosages, frequencies
+  - `conditions`: Diseases, disorders, findings
+  - `procedures`: Clinical interventions
+  - `lab_values`: Laboratory test results with units and reference ranges
+  - `vital_signs`: Patient vital measurements
+
+## APIs and Integrations
+
+### Internal APIs
+- **R → Python Bridge API**:
+  - `initialize_python_env()`: Set up Python environment
+  - `process_document(doc, options)`: Process a document with Python components
+  - `extract_entities(text, model)`: Perform NER on text
+  - `analyze_structure(doc)`: Analyze document structure
+  - `generate_fhir(data, resource_type)`: Create FHIR resources
+
+- **Python → Rust Bridge API**:
+  - `parse_document(bytes, format)`: Fast document parsing
+  - `process_ocr(image)`: Perform OCR on image
+  - `validate_fhir(resource)`: Validate FHIR resource
+  - `optimize_memory(large_doc)`: Handle large documents efficiently
+
+### External APIs
+- **FHIR API**:
+  - RESTful interface for FHIR resources
+  - Authentication and authorization
+  - Resource validation
+  - Search capabilities
+
+- **Healthcare System Integration**:
+  - EHR system connectors
+  - Terminology service integration
+  - Document repository interfaces
+
+## Infrastructure Requirements
+- **R Environment**:
+  - R 4.0+ with Shiny, reticulate, and core AIDE packages
+  - RStudio integration for development
+
+- **Python Environment**:
+  - Python 3.8+ with virtual environment
+  - Key dependencies: pymupdf, pytesseract, spaCy, transformers, fhir.resources
+  - Package management via requirements.txt and optional conda environment
+
+- **Rust Environment**:
+  - Rust 1.60+ with cargo
+  - PyO3/Maturin for Python bindings
+  - FHIR SDK and healthcare-specific libraries
+
+- **Development Tools**:
+  - Git with submodule support
+  - CI/CD pipeline for testing across languages
+  - Cross-platform build system
+
+- **Deployment Considerations**:
+  - Environment variable management for paths and credentials
+  - Docker containerization for consistent deployment
+  - Documentation generation for GitHub Pages
+
+# Development Roadmap  
+
+## Phase 1: Foundation and Basic Python Integration
+### Core Infrastructure
+- Set up project structure with appropriate organization for R, Python, and Rust components
+- Implement basic R-Python bridge using reticulate
+- Create configuration management for Python environment detection and setup
+- Develop essential data conversion utilities between R and Python
+- Set up testing framework spanning R and Python components
+
+### Enhanced PDF Processing
+- Implement PDF text extraction with pymupdf
+- Create document structure analysis for basic segmentation
+- Build R wrappers for Python PDF functions
+- Develop comparison tools to evaluate extraction quality vs. native R methods
+- Create visualization for document structure in R
+
+### Initial Documentation
+- Set up documentation system with clear structure
+- Document R-Python bridge functionality
+- Create user guides for enhanced PDF extraction
+- Develop contributor guidelines for multi-language development
+
+## Phase 2: Advanced Document Processing and AI/ML
+### Document Processing Enhancement
+- Implement multi-format document handling (DOCX, HTML)
+- Develop table extraction and structuring
+- Create image extraction pipeline
+- Build intelligent document chunking for large documents
+- Implement result caching and optimization
+
+### OCR Integration
+- Integrate Tesseract via pytesseract
+- Implement image preprocessing pipeline
+- Create R interface for OCR capabilities
+- Build document reconstruction from OCR results
+- Develop quality metrics for OCR results
+
+### AI/ML Capabilities
+- Implement NER for scientific and healthcare entities
+- Develop document layout analysis
+- Create semantic chunking models
+- Build confidence scoring for extractions
+- Implement pre-trained model management
+
+### UI Enhancements
+- Create progress tracking for long-running operations
+- Build visualization for extraction confidence
+- Develop comparison view for different extraction methods
+- Implement document structure explorer
+- Create user configuration interface for AI/ML components
+
+## Phase 3: Healthcare/FHIR Integration
+### FHIR Data Structures
+- Implement FHIR resource models
+- Create mapping from extracted data to FHIR resources
+- Build validation against FHIR standards
+- Develop serialization/deserialization for FHIR JSON/XML
+- Create R representation of FHIR resources
+
+### Healthcare Terminology
+- Integrate SNOMED CT terminology
+- Implement LOINC for laboratory observations
+- Support ICD-10/11 for diagnoses
+- Add RxNorm for medications
+- Build terminology mapping functions
+
+### Clinical Document Processing
+- Implement clinical document templates
+- Create specialized extractors for clinical notes
+- Build patient context management
+- Develop longitudinal data view
+- Implement healthcare-specific validation rules
+
+### Healthcare System Integration
+- Create FHIR RESTful API client
+- Build EHR system connectors
+- Implement terminology service integration
+- Develop document repository interfaces
+- Create secure credential management
+
+## Phase 4: Rust Performance Optimization
+### Performance Analysis
+- Identify performance bottlenecks in Python implementation
+- Create benchmarking framework
+- Analyze memory usage patterns
+- Document performance requirements
+- Prioritize components for Rust implementation
+
+### Rust Core Components
+- Implement document parsing in Rust
+- Create memory-efficient document representation
+- Build parallel processing capabilities
+- Develop OCR acceleration
+- Implement FHIR validation in Rust
+
+### Python-Rust Bridge
+- Create Python bindings for Rust components using PyO3/Maturin
+- Implement seamless data exchange
+- Build error handling and logging
+- Create packaging for cross-platform compatibility
+- Develop transparent fallback mechanisms
+
+### External Rust Integration
+- Integrate with RustEMR for EHR capabilities
+- Connect with Jamliquor for healthcare data processing
+- Implement shared data models
+- Build bidirectional data flow
+- Create unified API across integrated components
+
+## Phase 5: Scale and Production Readiness
+### Packaging and Distribution
+- Create comprehensive installation documentation
+- Build platform-specific installation packages
+- Implement dependency management
+- Develop version compatibility checks
+- Create upgrade path for existing users
+
+### Performance at Scale
+- Implement batch processing for large document sets
+- Create distributed processing capabilities
+- Build caching and optimization for repeated operations
+- Develop resource management for large workloads
+- Implement progress reporting and error recovery
+
+### Production Monitoring
+- Create logging infrastructure
+- Implement telemetry for performance monitoring
+- Build error tracking and reporting
+- Develop usage analytics
+- Create administrative dashboard
+
+### Documentation and Training
+- Finalize comprehensive documentation
+- Create tutorials and examples
+- Build interactive training materials
+- Develop API reference
+- Create contribution guidelines for sustainability
+
+# Logical Dependency Chain
+
+## Foundation (Must be built first)
+1. **Project Structure and Environment**: Set up the basic structure for R, Python, and Rust components, including submodule organization and environment configuration
+2. **R-Python Bridge via reticulate**: Establish the fundamental communication between R and Python, which is the core enabling technology for the extension
+3. **Basic Data Conversion**: Create utilities to convert data between R and Python formats, which all subsequent features will rely on
+4. **Configuration Management**: Implement detection and configuration of Python environment from R, essential for all Python functionality
+
+## Initial User-Facing Features
+5. **Enhanced PDF Extraction**: Implement improved PDF text extraction using Python libraries, providing immediate value over core AIDE
+6. **Document Structure Analysis**: Create basic document segmentation to understand document organization
+7. **Extraction Visualization**: Build UI components to visualize extraction results, making the benefits visible to users
+8. **Extraction Comparison**: Implement tools to compare extraction quality between methods, demonstrating the value of the extension
+
+## Advanced Capabilities
+9. **Multi-format Support**: Extend beyond PDF to handle DOCX, HTML, and other formats
+10. **Table Extraction**: Implement specialized extractors for tabular data
+11. **OCR Integration**: Add capabilities for image-based text extraction
+12. **Document Chunking**: Create intelligent handling for large documents
+13. **NER Models**: Implement named entity recognition for domain-specific entities
+
+## Healthcare-Specific Features
+14. **FHIR Resource Models**: Implement basic FHIR resource structures
+15. **Clinical Entity Extraction**: Create specialized extractors for clinical concepts
+16. **Terminology Integration**: Connect with healthcare terminology standards
+17. **FHIR Validation**: Implement validation against FHIR standards
+18. **Clinical Document Processing**: Build specialized processing for clinical documents
+
+## Performance Optimization
+19. **Performance Bottleneck Analysis**: Identify components that would benefit from Rust implementation
+20. **Memory Usage Optimization**: Implement efficient handling of large documents
+21. **Rust Core Implementations**: Reimplement critical components in Rust
+22. **Python-Rust Bindings**: Create seamless integration between Python and Rust components
+
+## Scale and Integration
+23. **Batch Processing**: Implement handling for large document sets
+24. **External System Integration**: Connect with healthcare systems and data repositories
+25. **Production Monitoring**: Add logging, telemetry, and error tracking
+26. **Comprehensive Documentation**: Finalize user, developer, and API documentation
+
+# Risks and Mitigations  
+
+## Technical Challenges
+
+### Cross-Language Integration Complexity
+- **Risk**: Integration between R, Python, and Rust creates complexity in data conversion, error handling, and debugging
+- **Mitigation**: 
+  - Implement comprehensive type conversion with validation
+  - Create clear error propagation across language boundaries
+  - Build extensive testing across languages
+  - Document all cross-language interfaces thoroughly
+  - Implement transparent logging across components
+
+### Performance and Memory Management
+- **Risk**: Healthcare documents can be large and numerous, creating performance and memory challenges
+- **Mitigation**:
+  - Implement streaming processing for large documents
+  - Use Rust for memory-critical components
+  - Create intelligent chunking strategies
+  - Implement resource monitoring and management
+  - Design graceful degradation for resource constraints
+
+### AI/ML Model Maintenance
+- **Risk**: AI/ML models require maintenance as dependencies evolve and better approaches emerge
+- **Mitigation**:
+  - Create abstraction layers around AI/ML components
+  - Implement model versioning and compatibility checking
+  - Design for model hot-swapping without code changes
+  - Build comprehensive model evaluation metrics
+  - Document model limitations and expected behaviors
+
+### Healthcare Data Compliance
+- **Risk**: Healthcare data handling introduces compliance requirements and validation complexity
+- **Mitigation**:
+  - Implement strict FHIR validation
+  - Create clear data handling documentation
+  - Build privacy-preserving processing options
+  - Implement audit logging for sensitive operations
+  - Design for secure credential management
+
+## MVP Definition Strategy
+
+### Incremental Value Delivery
+- **Risk**: Attempting too much at once may delay delivering any value to users
+- **Mitigation**:
+  - Define MVP as enhanced PDF extraction with basic structure analysis
+  - Prioritize features that provide immediate improvement over core AIDE
+  - Create clear comparison metrics to demonstrate value
+  - Implement modular architecture allowing independent feature deployment
+  - Design for backward compatibility with core AIDE
+
+### Balancing Breadth vs. Depth
+- **Risk**: Adding too many features without sufficient depth may result in shallow implementation
+- **Mitigation**:
+  - Focus initial development on core document processing capabilities
+  - Implement fewer document types deeply rather than many superficially
+  - Create thorough evaluation for each capability before moving to next
+  - Design extension points for future capabilities
+  - Document current limitations clearly
+
+### Technical Debt Management
+- **Risk**: Rapid development may accumulate technical debt, hindering future progress
+- **Mitigation**:
+  - Establish clear code quality standards across languages
+  - Implement comprehensive testing from the start
+  - Schedule regular technical debt review and remediation
+  - Document architectural decisions and trade-offs
+  - Create upgrade path for early implementation decisions
+
+## Resource Constraints
+
+### Cross-Language Expertise
+- **Risk**: Development requires expertise in R, Python, and Rust, which is uncommon
+- **Mitigation**:
+  - Create clear contribution guidelines for each language
+  - Document cross-language patterns and examples
+  - Build language-specific test suites with examples
+  - Implement automated quality checks for each language
+  - Create mentorship program for contributors
+
+### Testing Complexity
+- **Risk**: Testing across languages and with healthcare data is complex
+- **Mitigation**:
+  - Create synthetic test data representing realistic scenarios
+  - Implement component-level testing within each language
+  - Build integration tests across language boundaries
+  - Create performance benchmarking suite
+  - Document testing strategies for contributors
+
+### Documentation Burden
+- **Risk**: Multi-language, healthcare-focused project requires extensive documentation
+- **Mitigation**:
+  - Implement documentation as part of definition of done
+  - Create templates for common documentation needs
+  - Build automated documentation generation where possible
+  - Establish clear documentation review process
+  - Prioritize user-facing documentation for critical features
+
+# Appendix  
+
+## Research Findings
+
+### Document Processing Approaches
+- PDF extraction accuracy varies significantly between libraries
+- Table extraction remains a challenging problem requiring specialized approaches
+- Document structure recognition benefits from hybrid rule-based and ML approaches
+- OCR quality is highly dependent on image preprocessing
+- Large documents benefit significantly from streaming processing approaches
+
+### Healthcare Data Extraction Challenges
+- Clinical terminology variation requires normalization strategies
+- Contextual understanding is critical for accurate extraction
+- Negation detection is essential for clinical accuracy
+- Temporal relationships between clinical concepts are often implicit
+- Reference ranges and units require standardization for interoperability
+
+### Performance Considerations
+- Memory usage is the primary bottleneck for large document processing
+- Parallel processing provides significant benefits for document batches
+- Language boundary crossing introduces overhead that must be managed
+- Caching intermediate results can significantly improve performance
+- State management across processing steps requires careful design
+
+## Technical Specifications
+
+### Environment Variables
+- `RETICULATE_PYTHON`: Path to Python executable for reticulate
+- `AIDE_EXTENSION_HOME`: Base directory for extension components
+- `AIDE_MODELS_DIR`: Directory for model storage
+- `FHIR_VALIDATION_SERVER`: URL for external FHIR validation
+- `TERMINOLOGY_SERVICE_URL`: Endpoint for terminology services
+
+### Configuration Options
+- `extraction.engine`: Selected extraction engine (r, python, rust)
+- `extraction.confidence_threshold`: Minimum confidence for entity inclusion
+- `document.chunk_size`: Maximum document chunk size for processing
+- `fhir.validation_level`: Validation strictness (none, basic, full)
+- `performance.parallel_documents`: Number of documents to process in parallel
+
+### Dependency Management
+- R dependencies managed through DESCRIPTION file
+- Python dependencies in requirements.txt with versioning
+- Rust dependencies in Cargo.toml
+- System dependencies documented in installation guide
+
+### API Response Formats
+- Standard JSON structure for extraction results
+- FHIR-compliant JSON for healthcare data
+- Error response format with code, message, and resolution steps
+- Pagination format for large result sets
+- Progress reporting format for long-running operations

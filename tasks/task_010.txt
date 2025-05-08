@@ -1,0 +1,128 @@
+# Task ID: 10
+# Title: Implement Healthcare Terminology Integration
+# Status: pending
+# Dependencies: 7, 8
+# Priority: medium
+# Description: Connect with healthcare terminology standards (SNOMED CT, LOINC, ICD, RxNorm) for standardized coding of medical concepts.
+# Details:
+Create Python terminology module:
+```python
+# aide_extension/healthcare/terminology.py
+import requests
+from typing import List, Dict, Optional
+
+class TerminologyService:
+    def __init__(self, config=None):
+        self.config = config or {}
+        self.service_url = self.config.get('terminology_service_url')
+        self.api_key = self.config.get('terminology_api_key')
+    
+    def lookup_code(self, text, system, options=None):
+        """Look up terminology code for text"""
+        options = options or {}
+        
+        if system == 'SNOMED-CT':
+            return self._lookup_snomed(text, options)
+        elif system == 'LOINC':
+            return self._lookup_loinc(text, options)
+        elif system.startswith('ICD'):
+            return self._lookup_icd(text, system, options)
+        elif system == 'RxNorm':
+            return self._lookup_rxnorm(text, options)
+        else:
+            raise ValueError(f"Unsupported terminology system: {system}")
+    
+    def expand_code(self, code, system):
+        """Expand code to get additional information"""
+        # Implement code expansion logic
+        pass
+    
+    def _lookup_snomed(self, text, options):
+        """Look up SNOMED CT code"""
+        if not self.service_url:
+            # Use local dictionary if no service URL
+            return self._local_snomed_lookup(text)
+            
+        # Call terminology service API
+        response = requests.get(
+            f"{self.service_url}/snomed",
+            params={
+                'text': text,
+                'apiKey': self.api_key,
+                **options
+            }
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+```
+
+Create R wrapper for terminology services:
+```r
+# R/terminology.R
+lookup_medical_code <- function(text, system, options = list()) {
+  # Get Python bridge
+  py_bridge <- get_python_bridge()
+  
+  # Convert options to Python
+  py_options <- convert_to_python(options)
+  
+  # Call Python terminology function
+  py_result <- py_bridge$lookup_code(text, system, py_options)
+  
+  # Convert result back to R
+  r_result <- convert_from_python(py_result)
+  
+  return(r_result)
+}
+
+expand_medical_code <- function(code, system) {
+  # Get Python bridge
+  py_bridge <- get_python_bridge()
+  
+  # Call Python code expansion function
+  py_result <- py_bridge$expand_code(code, system)
+  
+  # Convert result back to R
+  r_result <- convert_from_python(py_result)
+  
+  return(r_result)
+}
+```
+
+# Test Strategy:
+Test terminology lookups with sample medical terms. Verify correct code assignment for common terms. Test with ambiguous terms requiring context. Benchmark performance with large terminology sets. Test integration with FHIR resource coding.
+
+# Subtasks:
+## 1. Terminology Service API Integration [pending]
+### Dependencies: None
+### Description: Establish connection with healthcare terminology services and implement core API functionality
+### Details:
+Implement RESTful API client for terminology services. Include authentication mechanisms, request/response handling, error management, and connection pooling. Ensure compliance with HL7 FHIR terminology service specifications. Create test cases for API connectivity, authentication failures, and response parsing. Document API rate limits and performance considerations.
+
+## 2. SNOMED CT Lookup Implementation [pending]
+### Dependencies: 10.1
+### Description: Develop functionality for SNOMED CT concept lookup, hierarchical navigation, and subsumption testing
+### Details:
+Implement SNOMED CT concept retrieval by ID, description, and relationships. Support ECL (Expression Constraint Language) queries. Include hierarchical navigation of SNOMED CT concepts. Ensure compliance with SNOMED International implementation guidelines. Create test cases for concept lookup, synonym matching, and hierarchical relationship validation. Support both RF1 and RF2 release formats.
+
+## 3. LOINC and ICD Code Lookup Implementation [pending]
+### Dependencies: 10.1
+### Description: Implement lookup functionality for LOINC laboratory codes and ICD-10/ICD-11 diagnosis codes
+### Details:
+Develop LOINC code search by code, long name, and component/property/time/system/scale attributes. Implement ICD-10 and ICD-11 code lookup with support for hierarchical navigation. Include mapping functions between ICD versions. Ensure compliance with LOINC and WHO ICD implementation guidelines. Create test cases for code validation, hierarchical relationships, and cross-version mapping accuracy.
+
+## 4. RxNorm Medication Terminology Integration [pending]
+### Dependencies: 10.1
+### Description: Implement RxNorm medication concept lookup, ingredient relationships, and drug class hierarchies
+### Details:
+Develop RxNorm concept lookup by RxCUI, name, and NDC code. Implement functions for navigating medication hierarchies, ingredient relationships, and therapeutic classes. Support dose form normalization and brand/generic equivalence. Ensure compliance with NLM RxNorm API specifications. Create test cases for medication concept lookup, ingredient relationship validation, and drug class hierarchy navigation.
+
+## 5. R Wrapper Implementation for Terminology Services [pending]
+### Dependencies: 10.1, 10.2, 10.3, 10.4
+### Description: Create comprehensive R package wrapper for all terminology services with documentation and examples
+### Details:
+Develop R package with consistent interface for all terminology services. Implement R6 or S4 class system for terminology objects. Create comprehensive documentation with roxygen2. Include vignettes with practical examples for each terminology system. Develop unit tests using testthat framework. Ensure CRAN submission readiness with proper namespace management and dependency handling. Create CI/CD pipeline for automated testing across R versions.
+

@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "generatedAt": "2025-05-08T17:03:40.912Z",
+    "tasksAnalyzed": 12,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": true
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Setup Project Structure and Environment Configuration",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the project structure setup task into subtasks covering: 1) Repository structure creation, 2) Environment configuration implementation, 3) Dependency management setup, and 4) Docker configuration. For each subtask, include specific deliverables and acceptance criteria.",
+      "reasoning": "This task involves setting up a complex multi-language project structure with R, Python, and Rust components. It requires environment detection, configuration handling, and dependency management across three languages. The Docker configuration adds another layer of complexity. The task has no dependencies but is foundational for all other tasks."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Implement R-Python Bridge via reticulate",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divide the R-Python bridge implementation into subtasks covering: 1) Python environment initialization, 2) Session management utilities, 3) Error handling and propagation, 4) Cross-language logging implementation, and 5) Core bridge class implementation. Include specific technical requirements and test cases for each subtask.",
+      "reasoning": "This task involves complex cross-language communication with reticulate. It requires handling Python process lifecycle, error propagation between languages, and establishing the core bridge that all other functionality will depend on. The complexity is high due to the need for robust error handling and session management across language boundaries."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Develop Data Conversion Utilities",
+      "complexityScore": 9,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the data conversion utilities task into subtasks covering: 1) R data.frame/tibble ↔ Python pandas DataFrame conversion, 2) R lists ↔ Python dictionaries/JSON conversion, 3) R matrices ↔ NumPy arrays conversion, 4) Document structure representation conversion, 5) FHIR resource conversion, and 6) Special value handling (NA/None, Inf, etc.). Include specific test cases for each conversion type.",
+      "reasoning": "This task involves bidirectional conversion between multiple data structures across languages, which is highly complex. It requires deep understanding of both R and Python data models, handling special values, and ensuring data integrity during conversion. The FHIR resource conversion adds domain-specific complexity. This is a foundational component that many other tasks will depend on."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Implement Enhanced PDF Processing",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the enhanced PDF processing task into subtasks covering: 1) Text extraction with layout preservation, 2) Table detection and extraction, 3) Figure and image extraction, and 4) R wrapper implementation for PDF processing. Include specific technical approaches and evaluation metrics for each subtask.",
+      "reasoning": "This task involves implementing PDF processing capabilities using Python libraries and creating R wrappers. It requires handling complex document layouts, table detection, and maintaining structure during extraction. The complexity comes from preserving document structure and implementing robust extraction algorithms."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Develop Document Structure Analysis",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the document structure analysis task into subtasks covering: 1) Section extraction and identification, 2) Hierarchical section relationship building, 3) Table and figure identification, 4) Reference extraction, and 5) R representation and methods implementation. Include specific algorithms and evaluation approaches for each subtask.",
+      "reasoning": "This task involves complex document understanding algorithms to identify sections, build hierarchies, and extract structural elements. It requires sophisticated text analysis to understand document organization and relationships between elements. The implementation spans both Python and R with custom data structures."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Implement OCR Integration",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the OCR integration task into subtasks covering: 1) Tesseract integration and configuration, 2) Image preprocessing pipeline implementation, 3) OCR result structuring and post-processing, and 4) R wrapper implementation for OCR functionality. Include specific image processing techniques and quality metrics for each subtask.",
+      "reasoning": "This task involves integrating Tesseract OCR via Python and implementing image preprocessing techniques. While OCR itself is complex, the task primarily involves integration rather than developing new OCR algorithms. The complexity comes from image preprocessing and structuring OCR results."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement Named Entity Recognition for Healthcare",
+      "complexityScore": 9,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Break down the healthcare NER task into subtasks covering: 1) spaCy model integration and configuration, 2) Transformer model integration for specialized entities, 3) Entity extraction and confidence scoring, 4) Healthcare-specific entity processing, and 5) R wrapper implementation for NER. Include specific model selection criteria and evaluation metrics for each subtask.",
+      "reasoning": "This task involves implementing sophisticated NLP models for healthcare entity recognition. It requires integrating multiple model types (spaCy and transformers), handling domain-specific terminology, and providing confidence scores. The healthcare domain adds significant complexity due to specialized terminology and requirements."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement FHIR Resource Models and Mapping",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divide the FHIR implementation task into subtasks covering: 1) Core FHIR resource structure implementation, 2) Patient resource mapping, 3) Clinical resource mapping (Condition, Observation), 4) Medication resource mapping, and 5) FHIR validation implementation. Include specific FHIR standards compliance requirements and test cases for each resource type.",
+      "reasoning": "This task involves implementing complex healthcare data standards (FHIR) and mapping extracted data to standardized formats. It requires deep understanding of FHIR resources, validation rules, and healthcare data models. The complexity comes from ensuring compliance with FHIR standards while handling diverse extracted data."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Develop UI Components for Extraction Visualization",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the UI components task into subtasks covering: 1) Document structure visualization implementation, 2) Entity highlighting and annotation UI, 3) Confidence score visualization components, and 4) Interactive JavaScript implementation for visualizations. Include specific UI/UX requirements and usability metrics for each component.",
+      "reasoning": "This task involves creating interactive UI components for visualizing complex extraction results. It requires implementing both R Shiny components and supporting JavaScript for interactivity. The complexity comes from creating intuitive visualizations for document structure, entities, and confidence scores."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Healthcare Terminology Integration",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Divide the healthcare terminology integration task into subtasks covering: 1) Terminology service API integration, 2) SNOMED CT lookup implementation, 3) LOINC and ICD code lookup implementation, 4) RxNorm medication terminology integration, and 5) R wrapper implementation for terminology services. Include specific terminology standards compliance requirements and test cases for each system.",
+      "reasoning": "This task involves integrating with complex healthcare terminology standards (SNOMED CT, LOINC, ICD, RxNorm). It requires implementing API connections to terminology services and handling specialized medical coding systems. The complexity comes from the domain-specific knowledge required and the need to handle multiple terminology standards."
+    },
+    {
+      "taskId": 11,
+      "taskTitle": "Implement Performance Optimization with Rust",
+      "complexityScore": 10,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Break down the Rust performance optimization task into subtasks covering: 1) Rust module structure and PyO3 integration, 2) PDF parsing optimization implementation, 3) Document format handling (DOCX, etc.), 4) OCR processing optimization, 5) Python-Rust bridge implementation, and 6) R wrapper updates for Rust components. Include specific performance benchmarks and optimization targets for each component.",
+      "reasoning": "This task involves implementing performance-critical components in Rust and integrating them with Python and R. It requires expertise in three programming languages, FFI (Foreign Function Interface), and low-level optimization techniques. The complexity is very high due to cross-language integration challenges and the need for both performance and correctness."
+    },
+    {
+      "taskId": 12,
+      "taskTitle": "Create Comprehensive Documentation and Examples",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the documentation task into subtasks covering: 1) User documentation and installation guides, 2) API reference documentation for all languages, 3) Developer documentation and architecture overview, and 4) Example notebooks and scripts for common use cases. Include specific documentation standards and completeness criteria for each documentation type.",
+      "reasoning": "This task involves creating comprehensive documentation across multiple languages and components. While not technically complex in implementation, it requires deep understanding of all system components and the ability to explain them clearly. The complexity comes from the breadth of coverage needed and ensuring consistency across documentation types."
+    }
+  ]
+}

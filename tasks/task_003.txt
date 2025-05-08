@@ -1,0 +1,91 @@
+# Task ID: 3
+# Title: Develop Data Conversion Utilities
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create utilities to convert data between R, Python, and Rust formats, which all subsequent features will rely on.
+# Details:
+Implement bidirectional conversion between data structures:
+- R data.frame/tibble ↔ Python pandas DataFrame
+- R lists ↔ Python dictionaries/JSON
+- R matrices ↔ NumPy arrays
+- Document structure representations across languages
+- FHIR resource conversion
+
+Create a conversion layer in R:
+```r
+# R/data_conversion.R
+convert_to_python <- function(r_object) {
+  # Handle different R object types
+  if (is.data.frame(r_object)) {
+    return(r_to_py_dataframe(r_object))
+  } else if (is.list(r_object)) {
+    return(r_to_py_dict(r_object))
+  }
+  # Add more type conversions
+}
+
+convert_from_python <- function(py_object) {
+  # Handle different Python object types
+  py_type <- reticulate::py_get_attr(py_object, "__class__")
+  if (identical(py_type, reticulate::import("pandas")$DataFrame)) {
+    return(py_to_r_dataframe(py_object))
+  }
+  # Add more type conversions
+}
+```
+
+Implement specialized converters for document structures:
+```python
+# aide_extension/conversion.py
+def document_structure_to_dict(doc_structure):
+    """Convert document structure to serializable dictionary"""
+    return {
+        "sections": [section_to_dict(s) for s in doc_structure.sections],
+        "tables": [table_to_dict(t) for t in doc_structure.tables],
+        "figures": [figure_to_dict(f) for f in doc_structure.figures],
+        "references": [ref_to_dict(r) for r in doc_structure.references],
+        "metadata": doc_structure.metadata.to_dict()
+    }
+```
+
+# Test Strategy:
+Create comprehensive test suite with diverse data structures. Test round-trip conversions (R → Python → R) for data integrity. Verify handling of special values (NA/None, Inf, etc.). Test performance with large datasets. Validate FHIR resource conversion against standard examples.
+
+# Subtasks:
+## 1. Implement R data.frame/tibble ↔ Python pandas DataFrame conversion [pending]
+### Dependencies: None
+### Description: Create bidirectional conversion utilities between R data.frame/tibble objects and Python pandas DataFrames
+### Details:
+Develop functions to convert R data.frame/tibble to pandas DataFrame and vice versa. Handle column types appropriately (numeric, character, factor, datetime). Test with various column types, including mixed types. Include test cases with: 1) Simple numeric data.frame, 2) Mixed type tibble with factors, 3) Data with row names, 4) Empty data.frame/DataFrame, 5) Data.frame with special characters in column names.
+
+## 2. Implement R lists ↔ Python dictionaries/JSON conversion [pending]
+### Dependencies: None
+### Description: Create bidirectional conversion utilities between R lists and Python dictionaries/JSON structures
+### Details:
+Develop functions to convert between R lists and Python dictionaries, preserving nested structures. Handle JSON serialization/deserialization in both languages. Test with: 1) Simple flat lists/dictionaries, 2) Deeply nested structures, 3) Lists containing data.frames, 4) Dictionaries with various Python types, 5) Lists with named and unnamed elements.
+
+## 3. Implement R matrices ↔ NumPy arrays conversion [pending]
+### Dependencies: None
+### Description: Create bidirectional conversion utilities between R matrices and NumPy arrays
+### Details:
+Develop functions to convert R matrices to NumPy arrays and vice versa. Preserve dimensions and data types. Handle row/column names appropriately. Test with: 1) Numeric matrices of various dimensions, 2) Character matrices, 3) Sparse matrices, 4) Matrices with row/column names, 5) Arrays with different dtypes in NumPy.
+
+## 4. Implement document structure representation conversion [pending]
+### Dependencies: 3.1, 3.2, 3.3
+### Description: Create utilities to convert between R and Python document structure representations
+### Details:
+Develop functions to convert complex document structures between R and Python. This includes nested combinations of data.frames, lists, and matrices in R to their Python equivalents. Test with: 1) Hierarchical document structures, 2) Mixed data types within documents, 3) Document with metadata and content sections, 4) Structures with circular references, 5) Large documents with deep nesting.
+
+## 5. Implement FHIR resource conversion [pending]
+### Dependencies: 3.2, 3.4
+### Description: Create specialized conversion utilities for FHIR healthcare resources between R and Python
+### Details:
+Develop functions specifically for FHIR resource conversion, handling the unique structure and requirements of FHIR data. Ensure compliance with FHIR standards during conversion. Test with: 1) Patient resource, 2) Observation resource, 3) Bundle containing multiple resources, 4) Resources with extensions, 5) Resources with references to other resources.
+
+## 6. Implement special value handling [pending]
+### Dependencies: 3.1, 3.2, 3.3
+### Description: Create utilities to handle special values during R ↔ Python conversion
+### Details:
+Develop functions to properly handle special values during conversion: NA/None/null, NaN, Inf/-Inf, empty strings, etc. Ensure consistent behavior across all conversion types. Test with: 1) Data containing NA values in R and None in Python, 2) Data with Inf/-Inf values, 3) Data with NaN values, 4) Empty/NULL/None objects, 5) Edge cases like NA in character vs. numeric columns.
+

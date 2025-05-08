@@ -1,0 +1,762 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Structure and Environment Configuration",
+      "description": "Establish the foundational project structure with appropriate organization for R, Python, and Rust components, including environment configuration and dependency management.",
+      "details": "Create a repository with the following structure:\n- `/R`: R package components and wrappers\n- `/python`: Python modules for document processing and AI/ML\n- `/rust`: Rust components for performance-critical operations\n- `/tests`: Cross-language testing framework\n- `/docs`: Documentation for all components\n\nImplement environment detection and configuration:\n- Create environment variable handling for `RETICULATE_PYTHON`, `AIDE_EXTENSION_HOME`, etc.\n- Setup configuration files for R, Python, and Rust dependencies\n- Implement version compatibility checking\n- Create Docker configuration for development environment\n\nDependency files to create:\n- R: DESCRIPTION file with reticulate and core AIDE dependencies\n- Python: requirements.txt with pymupdf, pytesseract, spaCy, transformers, fhir.resources\n- Rust: Cargo.toml with PyO3/Maturin and healthcare libraries",
+      "testStrategy": "Verify project structure with automated checks. Test environment detection across different platforms (Windows, macOS, Linux). Validate dependency resolution with clean environment installation tests. Create CI pipeline to verify cross-language build process.",
+      "priority": "high",
+      "dependencies": [],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Repository Structure Creation",
+          "description": "Create the foundational directory structure for the multi-language project with R, Python, and Rust components",
+          "dependencies": [],
+          "details": "Deliverables:\n- Create root project directory with README.md, LICENSE, and .gitignore\n- Set up language-specific subdirectories (/r, /python, /rust)\n- Create shared directories (/docs, /data, /tests, /config)\n- Implement cross-language integration points\n\nAcceptance Criteria:\n- Directory structure follows language-specific best practices\n- README includes project overview and setup instructions\n- .gitignore properly configured for all three languages\n- Integration points between language components are clearly defined",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Environment Configuration Implementation",
+          "description": "Implement environment detection and configuration handling for development, testing, and production environments",
+          "dependencies": [
+            1
+          ],
+          "details": "Deliverables:\n- Create environment configuration files for each context\n- Implement environment detection mechanism\n- Set up configuration loading for each language\n- Document environment variables and configuration options\n\nAcceptance Criteria:\n- Configuration system works across all three languages\n- Environment detection correctly identifies dev/test/prod\n- Sensitive information is properly secured\n- Configuration documentation is comprehensive and clear",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Dependency Management Setup",
+          "description": "Configure dependency management for R, Python, and Rust components with version pinning and reproducible builds",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Deliverables:\n- Set up R package management (renv or packrat)\n- Configure Python dependency management (poetry or pip with requirements.txt)\n- Implement Rust dependency management (Cargo.toml)\n- Create scripts for dependency installation and validation\n\nAcceptance Criteria:\n- All dependencies are explicitly defined with version constraints\n- Build process is reproducible across environments\n- Dependency conflicts are resolved\n- Installation process is documented and automated",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Docker Configuration",
+          "description": "Create Docker configuration for containerized development and deployment of the multi-language project",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Deliverables:\n- Create Dockerfile(s) for development and production\n- Implement docker-compose.yml for local development\n- Configure volume mounts for development workflow\n- Document Docker usage for development and deployment\n\nAcceptance Criteria:\n- Docker images successfully build with all dependencies\n- Development environment matches production configuration\n- Docker containers can communicate as needed\n- Build and deployment process is optimized and documented",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement R-Python Bridge via reticulate",
+      "description": "Establish the fundamental communication between R and Python using reticulate, which is the core enabling technology for the extension.",
+      "details": "Create R wrappers for Python functionality:\n- Implement `initialize_python_env()` function to set up and validate Python environment\n- Create session management utilities to handle Python process lifecycle\n- Develop error handling and propagation from Python to R\n- Implement logging across language boundaries\n\nPython module structure:\n```python\n# aide_extension/core.py\nclass AIDEPythonBridge:\n    def __init__(self, config=None):\n        self.config = config or {}\n        # Initialize Python environment\n        \n    def process_document(self, doc_path, options=None):\n        # Document processing logic\n        pass\n        \n    def extract_entities(self, text, model=None):\n        # Entity extraction logic\n        pass\n```\n\nR wrapper implementation:\n```r\n# R/python_bridge.R\ninitialize_python_env <- function(python_path = NULL, conda_env = NULL) {\n  # Set up Python environment using reticulate\n  if (!is.null(python_path)) {\n    reticulate::use_python(python_path)\n  } else if (!is.null(conda_env)) {\n    reticulate::use_condaenv(conda_env)\n  }\n  \n  # Import Python modules\n  aide_py <- reticulate::import(\"aide_extension.core\")\n  \n  # Initialize bridge\n  bridge <- aide_py$AIDEPythonBridge()\n  return(bridge)\n}\n```",
+      "testStrategy": "Create unit tests for R-Python communication. Test data transfer between languages with various data types. Verify error handling by triggering Python exceptions and checking R error messages. Test session management with multiple R processes accessing Python. Benchmark performance overhead of language boundary crossing.",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Python Environment Initialization",
+          "description": "Implement functionality to initialize, configure, and validate Python environments for the R-Python bridge",
+          "dependencies": [],
+          "details": "Create functions to: 1) Detect available Python installations, 2) Configure virtual environments if needed, 3) Validate required Python packages, 4) Initialize Python interpreter via reticulate, 5) Handle path configurations across operating systems. Include test cases for: successful initialization, handling missing Python, environment variable conflicts, and package dependency resolution.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Session Management Utilities",
+          "description": "Develop utilities to manage Python sessions, handle session persistence, and implement session recovery mechanisms",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement: 1) Session creation with configurable parameters, 2) Session state persistence, 3) Garbage collection handling, 4) Session recovery after errors, 5) Multiple session support. Test cases should include: session creation/destruction, state persistence across function calls, recovery from Python crashes, and handling multiple concurrent sessions.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Error Handling and Propagation",
+          "description": "Create a comprehensive error handling system that properly translates and propagates errors between R and Python",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement: 1) Python exception capture and translation to R errors, 2) Traceback preservation across language boundaries, 3) Custom error classes for bridge-specific issues, 4) Recovery mechanisms for non-fatal errors, 5) Detailed error reporting. Test with: syntax errors in Python, runtime exceptions, memory errors, and interrupted executions.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Cross-language Logging Implementation",
+          "description": "Develop a unified logging system that works across both R and Python components of the bridge",
+          "dependencies": [
+            1,
+            3
+          ],
+          "details": "Create: 1) Configurable logging levels, 2) Log message routing between languages, 3) Contextual logging with session information, 4) Log file management, 5) Integration with existing R logging frameworks. Test cases should verify: log propagation from Python to R, proper formatting, log level filtering, and performance impact during heavy operations.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Core Bridge Class Implementation",
+          "description": "Implement the main bridge class that will serve as the primary interface for R-Python interoperability",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Develop: 1) Core bridge class with initialization parameters, 2) Methods for data transfer between languages, 3) Function/method calling mechanisms, 4) Object reference management, 5) Memory management optimizations. Test with: various data types (dataframes, matrices, lists), large data transfers, complex nested objects, and performance benchmarks comparing direct reticulate calls.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Develop Data Conversion Utilities",
+      "description": "Create utilities to convert data between R, Python, and Rust formats, which all subsequent features will rely on.",
+      "details": "Implement bidirectional conversion between data structures:\n- R data.frame/tibble ↔ Python pandas DataFrame\n- R lists ↔ Python dictionaries/JSON\n- R matrices ↔ NumPy arrays\n- Document structure representations across languages\n- FHIR resource conversion\n\nCreate a conversion layer in R:\n```r\n# R/data_conversion.R\nconvert_to_python <- function(r_object) {\n  # Handle different R object types\n  if (is.data.frame(r_object)) {\n    return(r_to_py_dataframe(r_object))\n  } else if (is.list(r_object)) {\n    return(r_to_py_dict(r_object))\n  }\n  # Add more type conversions\n}\n\nconvert_from_python <- function(py_object) {\n  # Handle different Python object types\n  py_type <- reticulate::py_get_attr(py_object, \"__class__\")\n  if (identical(py_type, reticulate::import(\"pandas\")$DataFrame)) {\n    return(py_to_r_dataframe(py_object))\n  }\n  # Add more type conversions\n}\n```\n\nImplement specialized converters for document structures:\n```python\n# aide_extension/conversion.py\ndef document_structure_to_dict(doc_structure):\n    \"\"\"Convert document structure to serializable dictionary\"\"\"\n    return {\n        \"sections\": [section_to_dict(s) for s in doc_structure.sections],\n        \"tables\": [table_to_dict(t) for t in doc_structure.tables],\n        \"figures\": [figure_to_dict(f) for f in doc_structure.figures],\n        \"references\": [ref_to_dict(r) for r in doc_structure.references],\n        \"metadata\": doc_structure.metadata.to_dict()\n    }\n```",
+      "testStrategy": "Create comprehensive test suite with diverse data structures. Test round-trip conversions (R → Python → R) for data integrity. Verify handling of special values (NA/None, Inf, etc.). Test performance with large datasets. Validate FHIR resource conversion against standard examples.",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement R data.frame/tibble ↔ Python pandas DataFrame conversion",
+          "description": "Create bidirectional conversion utilities between R data.frame/tibble objects and Python pandas DataFrames",
+          "dependencies": [],
+          "details": "Develop functions to convert R data.frame/tibble to pandas DataFrame and vice versa. Handle column types appropriately (numeric, character, factor, datetime). Test with various column types, including mixed types. Include test cases with: 1) Simple numeric data.frame, 2) Mixed type tibble with factors, 3) Data with row names, 4) Empty data.frame/DataFrame, 5) Data.frame with special characters in column names.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Implement R lists ↔ Python dictionaries/JSON conversion",
+          "description": "Create bidirectional conversion utilities between R lists and Python dictionaries/JSON structures",
+          "dependencies": [],
+          "details": "Develop functions to convert between R lists and Python dictionaries, preserving nested structures. Handle JSON serialization/deserialization in both languages. Test with: 1) Simple flat lists/dictionaries, 2) Deeply nested structures, 3) Lists containing data.frames, 4) Dictionaries with various Python types, 5) Lists with named and unnamed elements.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Implement R matrices ↔ NumPy arrays conversion",
+          "description": "Create bidirectional conversion utilities between R matrices and NumPy arrays",
+          "dependencies": [],
+          "details": "Develop functions to convert R matrices to NumPy arrays and vice versa. Preserve dimensions and data types. Handle row/column names appropriately. Test with: 1) Numeric matrices of various dimensions, 2) Character matrices, 3) Sparse matrices, 4) Matrices with row/column names, 5) Arrays with different dtypes in NumPy.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Implement document structure representation conversion",
+          "description": "Create utilities to convert between R and Python document structure representations",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Develop functions to convert complex document structures between R and Python. This includes nested combinations of data.frames, lists, and matrices in R to their Python equivalents. Test with: 1) Hierarchical document structures, 2) Mixed data types within documents, 3) Document with metadata and content sections, 4) Structures with circular references, 5) Large documents with deep nesting.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Implement FHIR resource conversion",
+          "description": "Create specialized conversion utilities for FHIR healthcare resources between R and Python",
+          "dependencies": [
+            2,
+            4
+          ],
+          "details": "Develop functions specifically for FHIR resource conversion, handling the unique structure and requirements of FHIR data. Ensure compliance with FHIR standards during conversion. Test with: 1) Patient resource, 2) Observation resource, 3) Bundle containing multiple resources, 4) Resources with extensions, 5) Resources with references to other resources.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Implement special value handling",
+          "description": "Create utilities to handle special values during R ↔ Python conversion",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Develop functions to properly handle special values during conversion: NA/None/null, NaN, Inf/-Inf, empty strings, etc. Ensure consistent behavior across all conversion types. Test with: 1) Data containing NA values in R and None in Python, 2) Data with Inf/-Inf values, 3) Data with NaN values, 4) Empty/NULL/None objects, 5) Edge cases like NA in character vs. numeric columns.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Implement Enhanced PDF Processing",
+      "description": "Develop improved PDF text extraction using Python libraries like pymupdf, providing immediate value over core AIDE capabilities.",
+      "details": "Create Python module for enhanced PDF processing:\n```python\n# aide_extension/document_processing/pdf.py\nimport fitz  # PyMuPDF\nimport numpy as np\n\nclass PDFProcessor:\n    def __init__(self, config=None):\n        self.config = config or {}\n    \n    def extract_text(self, pdf_path, options=None):\n        \"\"\"Extract text with layout preservation\"\"\"\n        doc = fitz.open(pdf_path)\n        result = []\n        \n        for page_num in range(len(doc)):\n            page = doc[page_num]\n            # Extract text blocks with position information\n            blocks = page.get_text(\"blocks\")\n            # Process and structure text blocks\n            processed_blocks = self._process_blocks(blocks)\n            result.append({\n                \"page\": page_num + 1,\n                \"blocks\": processed_blocks\n            })\n            \n        return result\n    \n    def extract_tables(self, pdf_path, options=None):\n        \"\"\"Extract tables from PDF\"\"\"\n        # Implement table detection and extraction\n        pass\n        \n    def _process_blocks(self, blocks):\n        \"\"\"Process text blocks to preserve structure\"\"\"\n        # Implement block processing logic\n        pass\n```\n\nCreate R wrapper for PDF processing:\n```r\n# R/pdf_processing.R\nextract_pdf_text <- function(pdf_path, options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert options to Python\n  py_options <- convert_to_python(options)\n  \n  # Call Python function\n  py_result <- py_bridge$process_document(pdf_path, py_options)\n  \n  # Convert result back to R\n  r_result <- convert_from_python(py_result)\n  \n  return(r_result)\n}\n```",
+      "testStrategy": "Compare extraction quality with core AIDE using benchmark PDFs. Test with complex layouts, multi-column documents, and tables. Verify text order and structure preservation. Test with documents containing images and figures. Measure performance improvements over native R methods.",
+      "priority": "medium",
+      "dependencies": [
+        2,
+        3
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Text extraction with layout preservation",
+          "description": "Implement text extraction functionality that preserves the original document layout and structure",
+          "dependencies": [],
+          "details": "Use PyMuPDF (fitz) and pdfplumber libraries to extract text while maintaining spatial relationships. Implement paragraph detection based on spacing patterns. Preserve hierarchical structure (headings, sections, lists). Track text coordinates to maintain reading order. Evaluate using: 1) Character accuracy rate compared to original, 2) Layout similarity metric measuring spatial arrangement preservation, 3) Processing time for documents of varying complexity.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Table detection and extraction",
+          "description": "Develop algorithms to identify and extract tabular data from PDFs with proper structure",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement table detection using a combination of rule-based approaches (looking for grid lines, whitespace patterns) and ML-based detection (using pre-trained models like Tabula or Camelot). Convert extracted tables to pandas DataFrames with proper column/row structure. Handle merged cells and complex layouts. Evaluate using: 1) Table detection F1-score, 2) Cell extraction accuracy, 3) Structure preservation accuracy for complex tables.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Figure and image extraction",
+          "description": "Extract figures, charts, and images from PDFs while preserving quality and metadata",
+          "dependencies": [
+            1
+          ],
+          "details": "Use PyMuPDF to identify and extract embedded images at original resolution. Implement vector graphics conversion for charts and diagrams. Extract image captions and references by analyzing nearby text. Associate extracted images with their document context. Evaluate using: 1) Image extraction completeness (% of images successfully extracted), 2) Image quality preservation metrics, 3) Caption association accuracy.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "R wrapper implementation for PDF processing",
+          "description": "Create R package that wraps the Python PDF processing functionality",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Use reticulate package to create R bindings for the Python functions. Implement consistent R-friendly API following tidyverse design principles. Create R data structures (tibbles, lists) from Python outputs. Write comprehensive documentation and examples. Include error handling for Python dependencies. Evaluate using: 1) Function parity with Python implementation, 2) Performance overhead compared to direct Python calls, 3) R package check compliance, 4) User testing with R analysts.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Develop Document Structure Analysis",
+      "description": "Create document segmentation and structure analysis to understand document organization, sections, and hierarchical relationships.",
+      "details": "Implement document structure analysis in Python:\n```python\n# aide_extension/document_processing/structure.py\nfrom dataclasses import dataclass\nfrom typing import List, Dict, Optional\n\n@dataclass\nclass Section:\n    title: str\n    level: int\n    content: str\n    start_page: int\n    end_page: int\n    subsections: List['Section']\n\n@dataclass\nclass DocumentStructure:\n    sections: List[Section]\n    tables: List[Dict]\n    figures: List[Dict]\n    references: List[Dict]\n    metadata: Dict\n\nclass StructureAnalyzer:\n    def __init__(self, config=None):\n        self.config = config or {}\n    \n    def analyze(self, document):\n        \"\"\"Analyze document structure\"\"\"\n        # Extract sections based on font size, formatting, etc.\n        sections = self._extract_sections(document)\n        \n        # Build section hierarchy\n        hierarchical_sections = self._build_hierarchy(sections)\n        \n        # Identify tables and figures\n        tables = self._extract_tables(document)\n        figures = self._extract_figures(document)\n        \n        # Extract references\n        references = self._extract_references(document)\n        \n        return DocumentStructure(\n            sections=hierarchical_sections,\n            tables=tables,\n            figures=figures,\n            references=references,\n            metadata=document.metadata\n        )\n```\n\nCreate R representation of document structure:\n```r\n# R/document_structure.R\nanalyze_document_structure <- function(document, options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Call Python analysis function\n  py_structure <- py_bridge$analyze_structure(document)\n  \n  # Convert to R structure\n  r_structure <- convert_from_python(py_structure)\n  \n  # Add R-specific methods for working with structure\n  class(r_structure) <- c(\"aide_document_structure\", class(r_structure))\n  \n  return(r_structure)\n}\n\n# Method for printing document structure\nprint.aide_document_structure <- function(x, ...) {\n  cat(\"Document Structure:\\n\")\n  cat(\"  Sections:\", length(x$sections), \"\\n\")\n  cat(\"  Tables:\", length(x$tables), \"\\n\")\n  cat(\"  Figures:\", length(x$figures), \"\\n\")\n  cat(\"  References:\", length(x$references), \"\\n\")\n}\n```",
+      "testStrategy": "Test with various document types (research papers, clinical notes, etc.). Verify section hierarchy detection accuracy. Test table and figure identification. Validate reference extraction. Create visualization tests to ensure structure is properly represented.",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Section Extraction and Identification",
+          "description": "Develop algorithms to identify and extract document sections based on formatting, headers, and content patterns.",
+          "dependencies": [],
+          "details": "Implement regex-based and machine learning approaches for section detection. Use font size, formatting, and positional cues to identify section headers. Apply NLP techniques to classify section types (e.g., introduction, methods, results). Evaluate using precision/recall metrics against manually labeled documents. Create a section object model with attributes for title, content, level, and position.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Hierarchical Section Relationship Building",
+          "description": "Create algorithms to establish parent-child relationships between document sections and build a complete document tree.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement tree-based data structures to represent section hierarchies. Develop algorithms to determine section nesting based on header formatting and numbering schemes. Use indentation and font size as hierarchy indicators. Create visualization tools for document structure trees. Evaluate accuracy using tree edit distance metrics against gold standard document hierarchies.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Table and Figure Identification",
+          "description": "Develop methods to detect and extract tables, figures, and their captions within the document.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement computer vision and pattern recognition algorithms for table detection. Use OCR and layout analysis to identify table structures. Develop caption-matching algorithms to link figures/tables with their descriptions. Create structured representations of tables with row/column relationships preserved. Evaluate using IoU (Intersection over Union) metrics for spatial detection accuracy.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Reference Extraction",
+          "description": "Create algorithms to identify and extract citations and references, linking them to their in-text mentions.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement citation pattern recognition using regex and NLP techniques. Develop algorithms to parse different citation styles (APA, MLA, etc.). Create a citation graph connecting in-text references to bibliography entries. Extract metadata from references (authors, year, title, etc.). Evaluate using F1 scores for reference detection and linking accuracy.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "R Representation and Methods Implementation",
+          "description": "Develop R data structures and functions to represent and manipulate the extracted document structure.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Create S3/S4 classes in R to represent document structure elements. Implement methods for traversing, searching, and manipulating document trees. Develop visualization functions using ggplot2 for document structure. Create R interfaces to Python extraction algorithms using reticulate. Package the implementation with comprehensive documentation and unit tests. Benchmark performance on large document collections.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Implement OCR Integration",
+      "description": "Add capabilities for image-based text extraction using Tesseract via pytesseract, enabling extraction from scanned documents and images.",
+      "details": "Create Python OCR module:\n```python\n# aide_extension/document_processing/ocr.py\nimport pytesseract\nfrom PIL import Image\nimport numpy as np\nimport cv2\n\nclass OCRProcessor:\n    def __init__(self, config=None):\n        self.config = config or {}\n        # Configure Tesseract path if provided\n        if 'tesseract_path' in self.config:\n            pytesseract.pytesseract.tesseract_cmd = self.config['tesseract_path']\n    \n    def process_image(self, image_path, options=None):\n        \"\"\"Process image with OCR\"\"\"\n        options = options or {}\n        \n        # Load and preprocess image\n        image = Image.open(image_path)\n        preprocessed = self._preprocess_image(image, options)\n        \n        # Perform OCR with specified language\n        lang = options.get('language', 'eng')\n        ocr_result = pytesseract.image_to_data(\n            preprocessed, \n            lang=lang,\n            output_type=pytesseract.Output.DICT\n        )\n        \n        # Structure OCR results\n        structured_result = self._structure_ocr_result(ocr_result)\n        \n        return structured_result\n    \n    def _preprocess_image(self, image, options):\n        \"\"\"Preprocess image for better OCR results\"\"\"\n        # Convert PIL Image to OpenCV format\n        img = np.array(image)\n        \n        # Apply preprocessing based on options\n        if options.get('grayscale', True):\n            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)\n        \n        if options.get('denoise', True):\n            img = cv2.fastNlMeansDenoising(img)\n        \n        if options.get('threshold', True):\n            img = cv2.adaptiveThreshold(\n                img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \n                cv2.THRESH_BINARY, 11, 2\n            )\n            \n        return Image.fromarray(img)\n```\n\nCreate R wrapper for OCR:\n```r\n# R/ocr.R\nprocess_image_ocr <- function(image_path, options = list()) {\n  # Default options\n  default_options <- list(\n    language = \"eng\",\n    grayscale = TRUE,\n    denoise = TRUE,\n    threshold = TRUE\n  )\n  \n  # Merge with user options\n  options <- modifyList(default_options, options)\n  \n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert options to Python\n  py_options <- convert_to_python(options)\n  \n  # Call Python OCR function\n  py_result <- py_bridge$process_ocr(image_path, py_options)\n  \n  # Convert result back to R\n  r_result <- convert_from_python(py_result)\n  \n  return(r_result)\n}\n```",
+      "testStrategy": "Test with various image types (scanned documents, screenshots, photos). Evaluate OCR accuracy with ground truth documents. Test preprocessing options impact on recognition quality. Benchmark performance with large images. Test language support for medical terminology.",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Tesseract OCR Integration and Configuration",
+          "description": "Set up and configure Tesseract OCR engine with Python bindings",
+          "dependencies": [],
+          "details": "Install Tesseract OCR and pytesseract library. Configure language packs (English + additional languages as needed). Set up OCR engine parameters including PSM (Page Segmentation Mode) and OEM (OCR Engine Mode). Create configuration profiles for different document types (e.g., printed text, handwriting, tables). Implement quality metrics: OCR confidence scores and character recognition rate.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Image Preprocessing Pipeline Implementation",
+          "description": "Develop robust image preprocessing techniques to optimize OCR accuracy",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement image binarization using adaptive thresholding. Add noise reduction filters (Gaussian, median). Create deskewing algorithms to correct rotated text. Implement contrast enhancement and normalization. Add image scaling and resolution adjustment. Develop segmentation for complex layouts. Measure preprocessing effectiveness using PSNR (Peak Signal-to-Noise Ratio) and SSIM (Structural Similarity Index) metrics.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "OCR Result Structuring and Post-processing",
+          "description": "Process and structure raw OCR output into usable formats",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement text cleaning and normalization (whitespace, special characters). Create spell-checking and correction using dictionary-based approaches. Develop named entity recognition for key information extraction. Build structured output formats (JSON, CSV, XML). Implement confidence filtering to handle low-quality results. Measure accuracy using Levenshtein distance and F1 score for text similarity.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "R Wrapper Implementation for OCR Functionality",
+          "description": "Create an R package interface to the Python OCR implementation",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Set up reticulate for Python-R integration. Create R functions that mirror Python OCR functionality. Implement data conversion between R and Python objects. Add comprehensive documentation and examples. Create unit tests for R functions. Develop performance benchmarks comparing R wrapper to direct Python calls. Ensure compatibility with various R environments and versions.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Implement Named Entity Recognition for Healthcare",
+      "description": "Develop NER capabilities for healthcare and scientific entities using specialized models and terminology.",
+      "details": "Create Python NER module:\n```python\n# aide_extension/ai/ner.py\nimport spacy\nfrom transformers import AutoTokenizer, AutoModelForTokenClassification\nimport torch\n\nclass HealthcareNER:\n    def __init__(self, config=None):\n        self.config = config or {}\n        self.models = {}\n        \n        # Load default spaCy model\n        self.models['spacy'] = spacy.load(self.config.get('spacy_model', 'en_core_sci_md'))\n        \n        # Load transformer model if specified\n        if 'transformer_model' in self.config:\n            model_name = self.config['transformer_model']\n            self.tokenizer = AutoTokenizer.from_pretrained(model_name)\n            self.models['transformer'] = AutoModelForTokenClassification.from_pretrained(model_name)\n    \n    def extract_entities(self, text, model_type='spacy'):\n        \"\"\"Extract entities from text using specified model\"\"\"\n        if model_type == 'spacy':\n            return self._extract_spacy(text)\n        elif model_type == 'transformer':\n            return self._extract_transformer(text)\n        else:\n            raise ValueError(f\"Unknown model type: {model_type}\")\n    \n    def _extract_spacy(self, text):\n        \"\"\"Extract entities using spaCy\"\"\"\n        doc = self.models['spacy'](text)\n        entities = []\n        \n        for ent in doc.ents:\n            entities.append({\n                'text': ent.text,\n                'label': ent.label_,\n                'start': ent.start_char,\n                'end': ent.end_char,\n                'confidence': 1.0  # spaCy doesn't provide confidence scores\n            })\n            \n        return entities\n    \n    def _extract_transformer(self, text):\n        \"\"\"Extract entities using transformer model\"\"\"\n        # Implement transformer-based NER\n        pass\n```\n\nCreate R wrapper for NER:\n```r\n# R/ner.R\nextract_healthcare_entities <- function(text, model_type = \"spacy\", options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Call Python NER function\n  py_entities <- py_bridge$extract_entities(text, model_type)\n  \n  # Convert to R structure\n  r_entities <- convert_from_python(py_entities)\n  \n  # Add entity class\n  class(r_entities) <- c(\"aide_entities\", class(r_entities))\n  \n  return(r_entities)\n}\n```",
+      "testStrategy": "Test with medical texts containing known entities. Evaluate precision and recall against manually annotated corpus. Compare performance between different model types. Test with domain-specific terminology. Measure confidence score correlation with accuracy.",
+      "priority": "high",
+      "dependencies": [
+        3,
+        4
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "spaCy Model Integration and Configuration",
+          "description": "Set up and configure spaCy models for healthcare NER",
+          "dependencies": [],
+          "details": "Select appropriate spaCy models (en_core_sci_lg recommended). Configure entity recognition parameters including threshold settings. Implement pipeline components for medical terminology. Evaluate using precision/recall on standard medical corpora (i2b2, MIMIC). Benchmark performance against baseline models. Document model selection criteria including vocabulary coverage of medical terms.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Transformer Model Integration",
+          "description": "Integrate specialized transformer models for healthcare entity recognition",
+          "dependencies": [
+            1
+          ],
+          "details": "Select appropriate biomedical transformer models (BioBERT, ClinicalBERT, or PubMedBERT). Implement token classification heads for specialized entity types. Configure model parameters for optimal performance on medical text. Establish evaluation framework using F1 scores on specialized entities. Implement model caching to optimize performance. Document transformer model selection criteria and hyperparameter choices.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Entity Extraction and Confidence Scoring",
+          "description": "Develop mechanisms for entity extraction with confidence metrics",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement entity extraction pipeline combining spaCy and transformer outputs. Develop confidence scoring algorithm based on model probabilities. Create entity normalization functions for consistent output formatting. Implement conflict resolution when models disagree on entity boundaries. Evaluate using ROC curves and AUC metrics. Document confidence score calculation methodology and thresholds.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Healthcare-Specific Entity Processing",
+          "description": "Implement specialized processing for healthcare-specific entities",
+          "dependencies": [
+            3
+          ],
+          "details": "Develop custom processors for medical entities (medications, conditions, procedures, lab values). Implement context detection for negation and temporality. Create entity linking to standard medical ontologies (UMLS, SNOMED CT, RxNorm). Evaluate using domain-specific metrics including concept normalization accuracy. Document entity categorization schema and linking methodology.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "R Wrapper Implementation for NER",
+          "description": "Create R package wrapper for the NER functionality",
+          "dependencies": [
+            4
+          ],
+          "details": "Develop R interface using reticulate for Python interoperability. Implement R functions that mirror Python API. Create comprehensive documentation with examples. Develop unit tests for R wrapper functions. Package model artifacts for distribution. Implement error handling and logging specific to R environment. Document installation requirements and dependencies.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Implement FHIR Resource Models and Mapping",
+      "description": "Create FHIR resource structures and mapping from extracted data to FHIR-compliant formats for healthcare interoperability.",
+      "details": "Create Python FHIR module:\n```python\n# aide_extension/healthcare/fhir.py\nfrom fhir.resources import construct_fhir_element\nfrom fhir.resources.patient import Patient\nfrom fhir.resources.condition import Condition\nfrom fhir.resources.observation import Observation\nfrom fhir.resources.medicationstatement import MedicationStatement\n\nclass FHIRMapper:\n    def __init__(self, config=None):\n        self.config = config or {}\n    \n    def map_to_fhir(self, extracted_data, resource_type):\n        \"\"\"Map extracted data to FHIR resource\"\"\"\n        if resource_type == 'Patient':\n            return self._map_patient(extracted_data)\n        elif resource_type == 'Condition':\n            return self._map_condition(extracted_data)\n        elif resource_type == 'Observation':\n            return self._map_observation(extracted_data)\n        elif resource_type == 'MedicationStatement':\n            return self._map_medication(extracted_data)\n        else:\n            raise ValueError(f\"Unsupported resource type: {resource_type}\")\n    \n    def validate_resource(self, resource):\n        \"\"\"Validate FHIR resource\"\"\"\n        # Implement validation logic\n        pass\n    \n    def _map_patient(self, data):\n        \"\"\"Map data to Patient resource\"\"\"\n        patient = Patient()\n        \n        # Set patient attributes from extracted data\n        if 'name' in data:\n            patient.name = [{\n                'family': data['name'].get('family', ''),\n                'given': data['name'].get('given', [])\n            }]\n        \n        if 'birthDate' in data:\n            patient.birthDate = data['birthDate']\n        \n        if 'gender' in data:\n            patient.gender = data['gender']\n            \n        return patient\n```\n\nCreate R wrapper for FHIR:\n```r\n# R/fhir.R\nmap_to_fhir <- function(extracted_data, resource_type, options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert data to Python\n  py_data <- convert_to_python(extracted_data)\n  \n  # Call Python FHIR mapping function\n  py_resource <- py_bridge$generate_fhir(py_data, resource_type)\n  \n  # Convert to R structure\n  r_resource <- convert_from_python(py_resource)\n  \n  # Add FHIR resource class\n  class(r_resource) <- c(paste0(\"fhir_\", tolower(resource_type)), \"fhir_resource\", class(r_resource))\n  \n  return(r_resource)\n}\n\nvalidate_fhir <- function(resource, validation_level = \"basic\") {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert resource to Python\n  py_resource <- convert_to_python(resource)\n  \n  # Call Python validation function\n  validation_result <- py_bridge$validate_fhir(py_resource, validation_level)\n  \n  return(convert_from_python(validation_result))\n}\n```",
+      "testStrategy": "Test mapping with sample extracted data for each resource type. Validate generated resources against FHIR schemas. Test with edge cases (missing data, unusual values). Compare with reference FHIR examples. Test integration with terminology services for coded values.",
+      "priority": "high",
+      "dependencies": [
+        3,
+        7
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Core FHIR Resource Structure",
+          "description": "Design and implement the foundational FHIR resource structure that will serve as the base for all specific resource types.",
+          "dependencies": [],
+          "details": "Create base classes for FHIR resources following R4 specification (v4.0.1). Implement core elements including id, meta, implicitRules, language, and text. Ensure proper handling of extensions, modifierExtensions, and contained resources. Develop serialization/deserialization capabilities for both JSON and XML formats. Include test cases for resource creation, validation of required fields, and proper extension handling. Comply with FHIR structural validation rules per http://hl7.org/fhir/validation.html.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Implement Patient Resource Mapping",
+          "description": "Develop the Patient resource implementation with complete mapping from source data to FHIR-compliant structure.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement Patient resource according to http://hl7.org/fhir/patient.html specifications. Map demographic data including name, gender, birthDate, address, and contact information. Handle patient identifiers with proper system URIs. Implement support for managing multiple patient identifiers across systems. Create test cases covering: complete patient creation, partial data handling, proper formatting of names/addresses, and identifier validation. Ensure compliance with US Core Implementation Guide for Patient resources if applicable.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Implement Clinical Resource Mapping",
+          "description": "Develop implementations for clinical FHIR resources, specifically Condition and Observation, with complete mapping logic.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement Condition resource per http://hl7.org/fhir/condition.html and Observation resource per http://hl7.org/fhir/observation.html. Create mapping logic for diagnoses to Condition resources with proper coding (ICD-10, SNOMED CT). Develop mapping for lab results, vital signs, and other clinical observations to Observation resources. Implement proper handling of quantitative values with units (UCUM compliance). Create test cases for: coding validation, quantitative observation handling, qualitative observation handling, and proper patient referencing. Ensure support for both categorical and continuous observation values.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Implement Medication Resource Mapping",
+          "description": "Develop implementations for medication-related FHIR resources with complete mapping from source data.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement Medication resource per http://hl7.org/fhir/medication.html, MedicationRequest per http://hl7.org/fhir/medicationrequest.html, and MedicationStatement per http://hl7.org/fhir/medicationstatement.html. Create mapping logic for medication data including proper RxNorm coding. Implement dosage instructions handling with structured dosage representation. Develop mapping for medication status, dates, and prescriber information. Create test cases for: medication coding validation, dosage instruction parsing, medication status transitions, and proper patient/practitioner referencing. Ensure compliance with pharmacy FHIR implementation guides if applicable.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Implement FHIR Validation Framework",
+          "description": "Develop a comprehensive validation framework to ensure all generated FHIR resources comply with the standard.",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Implement validation against FHIR structural rules and constraints using official FHIR validation schemas. Develop profile-based validation to check resources against applicable implementation guides. Implement business rule validation specific to the implementation context. Create test suite with positive and negative test cases for each resource type. Include validation for required fields, cardinality constraints, value set bindings, and reference integrity. Implement reporting mechanism for validation errors with clear error messages and resolution guidance. Test against the official FHIR validation service at https://validator.fhir.org/ for compliance verification.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Develop UI Components for Extraction Visualization",
+      "description": "Build UI components to visualize extraction results, document structure, and confidence scores, making the benefits visible to users.",
+      "details": "Create R Shiny UI components:\n```r\n# R/ui_components.R\n\n#' Create a document structure visualization\n#' @param document_structure Document structure object\n#' @return Shiny UI component\ndocument_structure_viewer <- function(document_structure) {\n  # Create hierarchical visualization of document structure\n  shiny::div(\n    class = \"document-structure-viewer\",\n    shiny::h3(\"Document Structure\"),\n    shiny::div(\n      class = \"structure-tree\",\n      render_structure_tree(document_structure$sections)\n    ),\n    shiny::div(\n      class = \"structure-metadata\",\n      shiny::h4(\"Document Metadata\"),\n      render_metadata_table(document_structure$metadata)\n    )\n  )\n}\n\n#' Create an entity visualization component\n#' @param text Original text\n#' @param entities Extracted entities\n#' @return Shiny UI component\nentity_highlighter <- function(text, entities) {\n  # Create highlighted text with entity markers\n  highlighted_html <- create_highlighted_html(text, entities)\n  \n  shiny::div(\n    class = \"entity-highlighter\",\n    shiny::h3(\"Extracted Entities\"),\n    shiny::div(\n      class = \"highlighted-text\",\n      shiny::HTML(highlighted_html)\n    ),\n    shiny::div(\n      class = \"entity-legend\",\n      render_entity_legend(entities)\n    )\n  )\n}\n\n#' Create a confidence score visualization\n#' @param extraction_results Extraction results with confidence scores\n#' @return Shiny UI component\nconfidence_visualizer <- function(extraction_results) {\n  # Create visualization of confidence scores\n  shiny::div(\n    class = \"confidence-visualizer\",\n    shiny::h3(\"Extraction Confidence\"),\n    shiny::plotOutput(\"confidence_plot\", height = \"300px\"),\n    shiny::div(\n      class = \"confidence-table\",\n      render_confidence_table(extraction_results)\n    )\n  )\n}\n```\n\nImplement supporting JavaScript for interactive visualizations:\n```javascript\n// inst/www/js/document-viewer.js\nclass DocumentViewer {\n  constructor(elementId, documentData) {\n    this.element = document.getElementById(elementId);\n    this.data = documentData;\n    this.initialize();\n  }\n  \n  initialize() {\n    // Create document visualization\n    this.renderStructure();\n    this.setupInteractions();\n  }\n  \n  renderStructure() {\n    // Render document structure visualization\n  }\n  \n  setupInteractions() {\n    // Add event listeners for interactive elements\n  }\n}\n```",
+      "testStrategy": "Create test suite with sample documents and extraction results. Test UI components with various screen sizes. Verify interactive features work correctly. Test with edge cases (very large documents, many entities). Conduct usability testing with representative users.",
+      "priority": "medium",
+      "dependencies": [
+        5,
+        7,
+        8
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Document Structure Visualization Implementation",
+          "description": "Create a UI component that visualizes the hierarchical structure of documents, showing sections, paragraphs, and other structural elements.",
+          "dependencies": [],
+          "details": "Implement a tree-view visualization that displays document hierarchy with collapsible sections. Include pagination for multi-page documents. The visualization should support zooming (75%-150%) and maintain responsive design across device sizes. Success metrics: 90% of users should be able to navigate document structure within 30 seconds of first interaction.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Entity Highlighting and Annotation UI",
+          "description": "Develop UI components for highlighting extracted entities within documents and allowing users to add, edit, or remove annotations.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create color-coded highlighting system for different entity types. Implement tooltip overlays showing entity metadata on hover. Design annotation sidebar with filtering capabilities. Include keyboard shortcuts for common annotation actions. Success metrics: Annotation process should take <15 seconds per entity and achieve >95% accuracy in user testing.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Confidence Score Visualization Components",
+          "description": "Build UI elements that visually represent confidence scores for extracted entities and document sections.",
+          "dependencies": [
+            2
+          ],
+          "details": "Implement color-gradient indicators (red to green) for confidence levels. Create mini-charts showing confidence distribution across document. Design threshold controls for filtering by confidence level. Include detailed confidence view in entity inspection panel. Success metrics: Users should correctly interpret confidence levels with 90% accuracy in blind testing.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Interactive JavaScript Implementation for Visualizations",
+          "description": "Develop JavaScript code to enable interactive features for all visualization components.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Implement smooth transitions between document views. Create drag-and-drop functionality for annotation reordering. Add event listeners for all interactive elements. Ensure cross-browser compatibility (Chrome, Firefox, Safari, Edge). Optimize performance to maintain <100ms response time for interactions. Success metrics: UI should maintain 60fps during interactions and score >85 on Google Lighthouse performance tests.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Implement Healthcare Terminology Integration",
+      "description": "Connect with healthcare terminology standards (SNOMED CT, LOINC, ICD, RxNorm) for standardized coding of medical concepts.",
+      "details": "Create Python terminology module:\n```python\n# aide_extension/healthcare/terminology.py\nimport requests\nfrom typing import List, Dict, Optional\n\nclass TerminologyService:\n    def __init__(self, config=None):\n        self.config = config or {}\n        self.service_url = self.config.get('terminology_service_url')\n        self.api_key = self.config.get('terminology_api_key')\n    \n    def lookup_code(self, text, system, options=None):\n        \"\"\"Look up terminology code for text\"\"\"\n        options = options or {}\n        \n        if system == 'SNOMED-CT':\n            return self._lookup_snomed(text, options)\n        elif system == 'LOINC':\n            return self._lookup_loinc(text, options)\n        elif system.startswith('ICD'):\n            return self._lookup_icd(text, system, options)\n        elif system == 'RxNorm':\n            return self._lookup_rxnorm(text, options)\n        else:\n            raise ValueError(f\"Unsupported terminology system: {system}\")\n    \n    def expand_code(self, code, system):\n        \"\"\"Expand code to get additional information\"\"\"\n        # Implement code expansion logic\n        pass\n    \n    def _lookup_snomed(self, text, options):\n        \"\"\"Look up SNOMED CT code\"\"\"\n        if not self.service_url:\n            # Use local dictionary if no service URL\n            return self._local_snomed_lookup(text)\n            \n        # Call terminology service API\n        response = requests.get(\n            f\"{self.service_url}/snomed\",\n            params={\n                'text': text,\n                'apiKey': self.api_key,\n                **options\n            }\n        )\n        \n        if response.status_code == 200:\n            return response.json()\n        else:\n            return None\n```\n\nCreate R wrapper for terminology services:\n```r\n# R/terminology.R\nlookup_medical_code <- function(text, system, options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert options to Python\n  py_options <- convert_to_python(options)\n  \n  # Call Python terminology function\n  py_result <- py_bridge$lookup_code(text, system, py_options)\n  \n  # Convert result back to R\n  r_result <- convert_from_python(py_result)\n  \n  return(r_result)\n}\n\nexpand_medical_code <- function(code, system) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Call Python code expansion function\n  py_result <- py_bridge$expand_code(code, system)\n  \n  # Convert result back to R\n  r_result <- convert_from_python(py_result)\n  \n  return(r_result)\n}\n```",
+      "testStrategy": "Test terminology lookups with sample medical terms. Verify correct code assignment for common terms. Test with ambiguous terms requiring context. Benchmark performance with large terminology sets. Test integration with FHIR resource coding.",
+      "priority": "medium",
+      "dependencies": [
+        7,
+        8
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Terminology Service API Integration",
+          "description": "Establish connection with healthcare terminology services and implement core API functionality",
+          "dependencies": [],
+          "details": "Implement RESTful API client for terminology services. Include authentication mechanisms, request/response handling, error management, and connection pooling. Ensure compliance with HL7 FHIR terminology service specifications. Create test cases for API connectivity, authentication failures, and response parsing. Document API rate limits and performance considerations.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "SNOMED CT Lookup Implementation",
+          "description": "Develop functionality for SNOMED CT concept lookup, hierarchical navigation, and subsumption testing",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement SNOMED CT concept retrieval by ID, description, and relationships. Support ECL (Expression Constraint Language) queries. Include hierarchical navigation of SNOMED CT concepts. Ensure compliance with SNOMED International implementation guidelines. Create test cases for concept lookup, synonym matching, and hierarchical relationship validation. Support both RF1 and RF2 release formats.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "LOINC and ICD Code Lookup Implementation",
+          "description": "Implement lookup functionality for LOINC laboratory codes and ICD-10/ICD-11 diagnosis codes",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop LOINC code search by code, long name, and component/property/time/system/scale attributes. Implement ICD-10 and ICD-11 code lookup with support for hierarchical navigation. Include mapping functions between ICD versions. Ensure compliance with LOINC and WHO ICD implementation guidelines. Create test cases for code validation, hierarchical relationships, and cross-version mapping accuracy.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "RxNorm Medication Terminology Integration",
+          "description": "Implement RxNorm medication concept lookup, ingredient relationships, and drug class hierarchies",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop RxNorm concept lookup by RxCUI, name, and NDC code. Implement functions for navigating medication hierarchies, ingredient relationships, and therapeutic classes. Support dose form normalization and brand/generic equivalence. Ensure compliance with NLM RxNorm API specifications. Create test cases for medication concept lookup, ingredient relationship validation, and drug class hierarchy navigation.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "R Wrapper Implementation for Terminology Services",
+          "description": "Create comprehensive R package wrapper for all terminology services with documentation and examples",
+          "dependencies": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "details": "Develop R package with consistent interface for all terminology services. Implement R6 or S4 class system for terminology objects. Create comprehensive documentation with roxygen2. Include vignettes with practical examples for each terminology system. Develop unit tests using testthat framework. Ensure CRAN submission readiness with proper namespace management and dependency handling. Create CI/CD pipeline for automated testing across R versions.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Implement Performance Optimization with Rust",
+      "description": "Identify and implement performance-critical components in Rust, focusing on document parsing, OCR, and memory-efficient handling of large documents.",
+      "details": "Create Rust document processing module:\n```rust\n// src/lib.rs\nuse pyo3::prelude::*;\nuse pyo3::wrap_pyfunction;\n\n#[pyfunction]\nfn parse_document(data: &[u8], format: &str) -> PyResult<String> {\n    // Implement fast document parsing based on format\n    match format {\n        \"pdf\" => parse_pdf(data),\n        \"docx\" => parse_docx(data),\n        _ => Err(pyo3::exceptions::PyValueError::new_err(\n            format!(\"Unsupported format: {}\", format)\n        ))\n    }\n}\n\nfn parse_pdf(data: &[u8]) -> PyResult<String> {\n    // Implement optimized PDF parsing\n    // This is a simplified example\n    Ok(String::from(\"PDF content extracted with Rust\"))\n}\n\nfn parse_docx(data: &[u8]) -> PyResult<String> {\n    // Implement optimized DOCX parsing\n    // This is a simplified example\n    Ok(String::from(\"DOCX content extracted with Rust\"))\n}\n\n#[pyfunction]\nfn process_ocr(image_data: &[u8], options: Option<&PyDict>) -> PyResult<String> {\n    // Extract options with defaults\n    let py_options = options.unwrap_or_else(|| PyDict::new(Python::acquire_gil().python()));\n    \n    // Implement optimized OCR processing\n    // This is a simplified example\n    Ok(String::from(\"OCR processed with Rust\"))\n}\n\n#[pymodule]\nfn aide_rust(_py: Python, m: &PyModule) -> PyResult<()> {\n    m.add_function(wrap_pyfunction!(parse_document, m)?)?;\n    m.add_function(wrap_pyfunction!(process_ocr, m)?)?;\n    Ok(())\n}\n```\n\nCreate Python bridge to Rust:\n```python\n# aide_extension/rust_bridge.py\nimport aide_rust\n\nclass RustProcessor:\n    def __init__(self, config=None):\n        self.config = config or {}\n    \n    def parse_document(self, file_path, format):\n        \"\"\"Parse document using Rust implementation\"\"\"\n        with open(file_path, 'rb') as f:\n            data = f.read()\n        \n        return aide_rust.parse_document(data, format)\n    \n    def process_ocr(self, image_path, options=None):\n        \"\"\"Process OCR using Rust implementation\"\"\"\n        with open(image_path, 'rb') as f:\n            data = f.read()\n        \n        return aide_rust.process_ocr(data, options)\n```\n\nUpdate R wrappers to use Rust implementation:\n```r\n# R/rust_processing.R\nparse_document_rust <- function(file_path, format) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Call Rust-powered function via Python\n  result <- py_bridge$parse_document_rust(file_path, format)\n  \n  return(convert_from_python(result))\n}\n\nprocess_ocr_rust <- function(image_path, options = list()) {\n  # Get Python bridge\n  py_bridge <- get_python_bridge()\n  \n  # Convert options to Python\n  py_options <- convert_to_python(options)\n  \n  # Call Rust-powered OCR function via Python\n  result <- py_bridge$process_ocr_rust(image_path, py_options)\n  \n  return(convert_from_python(result))\n}\n```",
+      "testStrategy": "Benchmark Rust implementations against Python equivalents. Test with large documents to verify memory efficiency. Measure performance across different document types and sizes. Test parallel processing capabilities. Verify results match between implementations.",
+      "priority": "high",
+      "dependencies": [
+        4,
+        6
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design Rust Module Structure and PyO3 Integration",
+          "description": "Create the foundational Rust module structure and establish PyO3 integration for Python bindings",
+          "dependencies": [],
+          "details": "1) Design a modular Rust crate structure with separate modules for PDF parsing, document format handling, and OCR processing\n2) Set up PyO3 bindings for each module\n3) Establish error handling patterns across language boundaries\n4) Create benchmark harness to measure baseline performance\n5) Define performance targets: 3x speedup for core operations compared to pure Python implementation\n6) Document API design decisions and integration points",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Implement PDF Parsing Optimization in Rust",
+          "description": "Develop high-performance PDF parsing components in Rust with memory optimization",
+          "dependencies": [
+            1
+          ],
+          "details": "1) Implement PDF parsing using lopdf or similar Rust libraries\n2) Optimize memory usage for large PDF documents (target: process 100MB+ PDFs with <500MB memory)\n3) Implement parallel processing for multi-page documents\n4) Create text extraction algorithms optimized for different PDF structures\n5) Benchmark against Python-based solutions (target: 5x faster parsing)\n6) Implement streaming processing for memory-constrained environments",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Develop Document Format Handlers for DOCX and Other Formats",
+          "description": "Create Rust implementations for processing DOCX, XLSX, and other document formats",
+          "dependencies": [
+            1
+          ],
+          "details": "1) Implement DOCX parsing using docx-rs or similar libraries\n2) Create handlers for XLSX, PPTX, and other common formats\n3) Develop unified content extraction interface across formats\n4) Optimize for memory efficiency (target: 50% less memory than Python equivalents)\n5) Implement parallel processing where applicable\n6) Benchmark performance (target: 4x speedup over Python implementations)",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Optimize OCR Processing in Rust",
+          "description": "Implement and optimize OCR processing components using Rust with Tesseract bindings",
+          "dependencies": [
+            1
+          ],
+          "details": "1) Create Rust bindings for Tesseract OCR\n2) Implement image preprocessing optimizations\n3) Develop parallel OCR processing for multi-page documents\n4) Optimize memory usage for large documents (target: process 1000+ page documents)\n5) Implement caching mechanisms for improved performance\n6) Benchmark against Python Tesseract implementations (target: 3x performance improvement)",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Implement Python-Rust Bridge with Comprehensive API",
+          "description": "Develop a complete Python API that leverages the Rust components with seamless integration",
+          "dependencies": [
+            2,
+            3,
+            4
+          ],
+          "details": "1) Create Pythonic wrapper classes around Rust implementations\n2) Implement proper memory management across language boundary\n3) Ensure exception handling propagates correctly\n4) Develop comprehensive test suite comparing results with pure Python implementations\n5) Create performance monitoring tools to track improvements\n6) Document API with usage examples (target: drop-in replacement for existing Python functions with 3-5x performance improvement)",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Update R Wrapper for Rust Components",
+          "description": "Extend the integration to R by updating R wrappers to use the new Rust-based functionality",
+          "dependencies": [
+            5
+          ],
+          "details": "1) Evaluate options for R-Rust integration (via Python bridge or direct)\n2) Implement R wrapper functions that maintain API compatibility\n3) Create R-specific benchmarking suite\n4) Optimize R-specific data structures for efficient data transfer\n5) Document R integration with examples\n6) Verify performance improvements in R context (target: 3x speedup over current implementation)",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Create Comprehensive Documentation and Examples",
+      "description": "Develop thorough documentation for all components, including user guides, API references, and examples for common use cases.",
+      "details": "Create documentation structure:\n\n1. User Documentation:\n   - Installation guide for all components (R, Python, Rust)\n   - Configuration options and environment setup\n   - Basic usage examples for common tasks\n   - Advanced usage patterns and customization\n   - Troubleshooting guide\n\n2. API Reference:\n   - R function documentation using roxygen2\n   - Python module documentation using Sphinx\n   - Rust API documentation using rustdoc\n   - Cross-language function mapping reference\n\n3. Developer Documentation:\n   - Architecture overview\n   - Component interaction diagrams\n   - Data flow documentation\n   - Extension development guide\n   - Testing framework documentation\n\n4. Example Notebooks and Scripts:\n   - Scientific literature extraction examples\n   - Clinical document processing examples\n   - Custom extraction pipeline examples\n   - Performance optimization examples\n   - FHIR integration examples\n\nImplement documentation generation:\n```r\n# Generate R package documentation\ndevtools::document()\n\n# Build package website with pkgdown\npkgdown::build_site()\n```\n\nCreate example R scripts:\n```r\n# examples/scientific_literature.R\nlibrary(aide.extension)\n\n# Initialize extension\ninitialize_python_env()\n\n# Process scientific paper\npaper_path <- system.file(\"examples\", \"sample_paper.pdf\", package = \"aide.extension\")\nresult <- extract_pdf_text(paper_path)\n\n# Analyze document structure\nstructure <- analyze_document_structure(result)\nprint(structure)\n\n# Extract scientific entities\nentities <- extract_healthcare_entities(result$text, model_type = \"scientific\")\nprint(entities)\n\n# Visualize results\nif (interactive()) {\n  entity_highlighter(result$text, entities)\n}\n```",
+      "testStrategy": "Verify documentation completeness with checklist. Test examples on clean environment to ensure they work as documented. Review documentation for clarity and accuracy. Test cross-references and links. Validate API reference against actual implementation.",
+      "priority": "medium",
+      "dependencies": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create User Documentation and Installation Guides",
+          "description": "Develop comprehensive user documentation and installation guides for all supported platforms and environments.",
+          "dependencies": [],
+          "details": "Include step-by-step installation instructions for Windows, macOS, and Linux; troubleshooting guides; system requirements; configuration options; getting started tutorials. Documentation should follow the Google Developer Documentation Style Guide. Completeness criteria: All installation paths tested and verified, screenshots included where appropriate, and feedback incorporated from at least 3 test users with different technical backgrounds.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Develop API Reference Documentation",
+          "description": "Create detailed API reference documentation for all supported programming languages and interfaces.",
+          "dependencies": [
+            1
+          ],
+          "details": "Document all classes, methods, parameters, return values, and exceptions for Python, JavaScript, Java, and REST API interfaces. Include code examples for each method. Follow language-specific documentation standards (PEP 257 for Python, JSDoc for JavaScript, Javadoc for Java). Completeness criteria: 100% API coverage, all parameters documented, all return types specified, and examples for common use cases provided for each method.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Create Developer Documentation and Architecture Overview",
+          "description": "Develop internal developer documentation including architecture diagrams, component interactions, and contribution guidelines.",
+          "dependencies": [
+            2
+          ],
+          "details": "Create system architecture diagrams (C4 model); document component interactions; data flow diagrams; sequence diagrams for key processes; deployment models; performance considerations; security guidelines; and contribution workflow. Follow the Arc42 documentation template. Completeness criteria: All major components and interactions documented, architecture decisions recorded with rationales, and documentation reviewed by the technical lead.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Develop Example Notebooks and Scripts",
+          "description": "Create comprehensive example notebooks and scripts demonstrating common use cases and best practices.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Develop Jupyter notebooks and executable scripts covering: data import/export, model training, inference, performance optimization, and integration with other tools. Include comments explaining each step and expected outputs. Follow PEP 8 for Python code style and include markdown explanations in notebooks. Completeness criteria: At least 10 distinct use cases covered, all examples tested in clean environments, and execution time/resource requirements documented for each example.",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}

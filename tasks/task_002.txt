@@ -1,0 +1,84 @@
+# Task ID: 2
+# Title: Implement R-Python Bridge via reticulate
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Establish the fundamental communication between R and Python using reticulate, which is the core enabling technology for the extension.
+# Details:
+Create R wrappers for Python functionality:
+- Implement `initialize_python_env()` function to set up and validate Python environment
+- Create session management utilities to handle Python process lifecycle
+- Develop error handling and propagation from Python to R
+- Implement logging across language boundaries
+
+Python module structure:
+```python
+# aide_extension/core.py
+class AIDEPythonBridge:
+    def __init__(self, config=None):
+        self.config = config or {}
+        # Initialize Python environment
+        
+    def process_document(self, doc_path, options=None):
+        # Document processing logic
+        pass
+        
+    def extract_entities(self, text, model=None):
+        # Entity extraction logic
+        pass
+```
+
+R wrapper implementation:
+```r
+# R/python_bridge.R
+initialize_python_env <- function(python_path = NULL, conda_env = NULL) {
+  # Set up Python environment using reticulate
+  if (!is.null(python_path)) {
+    reticulate::use_python(python_path)
+  } else if (!is.null(conda_env)) {
+    reticulate::use_condaenv(conda_env)
+  }
+  
+  # Import Python modules
+  aide_py <- reticulate::import("aide_extension.core")
+  
+  # Initialize bridge
+  bridge <- aide_py$AIDEPythonBridge()
+  return(bridge)
+}
+```
+
+# Test Strategy:
+Create unit tests for R-Python communication. Test data transfer between languages with various data types. Verify error handling by triggering Python exceptions and checking R error messages. Test session management with multiple R processes accessing Python. Benchmark performance overhead of language boundary crossing.
+
+# Subtasks:
+## 1. Python Environment Initialization [pending]
+### Dependencies: None
+### Description: Implement functionality to initialize, configure, and validate Python environments for the R-Python bridge
+### Details:
+Create functions to: 1) Detect available Python installations, 2) Configure virtual environments if needed, 3) Validate required Python packages, 4) Initialize Python interpreter via reticulate, 5) Handle path configurations across operating systems. Include test cases for: successful initialization, handling missing Python, environment variable conflicts, and package dependency resolution.
+
+## 2. Session Management Utilities [pending]
+### Dependencies: 2.1
+### Description: Develop utilities to manage Python sessions, handle session persistence, and implement session recovery mechanisms
+### Details:
+Implement: 1) Session creation with configurable parameters, 2) Session state persistence, 3) Garbage collection handling, 4) Session recovery after errors, 5) Multiple session support. Test cases should include: session creation/destruction, state persistence across function calls, recovery from Python crashes, and handling multiple concurrent sessions.
+
+## 3. Error Handling and Propagation [pending]
+### Dependencies: 2.1, 2.2
+### Description: Create a comprehensive error handling system that properly translates and propagates errors between R and Python
+### Details:
+Implement: 1) Python exception capture and translation to R errors, 2) Traceback preservation across language boundaries, 3) Custom error classes for bridge-specific issues, 4) Recovery mechanisms for non-fatal errors, 5) Detailed error reporting. Test with: syntax errors in Python, runtime exceptions, memory errors, and interrupted executions.
+
+## 4. Cross-language Logging Implementation [pending]
+### Dependencies: 2.1, 2.3
+### Description: Develop a unified logging system that works across both R and Python components of the bridge
+### Details:
+Create: 1) Configurable logging levels, 2) Log message routing between languages, 3) Contextual logging with session information, 4) Log file management, 5) Integration with existing R logging frameworks. Test cases should verify: log propagation from Python to R, proper formatting, log level filtering, and performance impact during heavy operations.
+
+## 5. Core Bridge Class Implementation [pending]
+### Dependencies: 2.1, 2.2, 2.3, 2.4
+### Description: Implement the main bridge class that will serve as the primary interface for R-Python interoperability
+### Details:
+Develop: 1) Core bridge class with initialization parameters, 2) Methods for data transfer between languages, 3) Function/method calling mechanisms, 4) Object reference management, 5) Memory management optimizations. Test with: various data types (dataframes, matrices, lists), large data transfers, complex nested objects, and performance benchmarks comparing direct reticulate calls.
+

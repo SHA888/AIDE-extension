@@ -1,0 +1,128 @@
+# Task ID: 8
+# Title: Implement FHIR Resource Models and Mapping
+# Status: pending
+# Dependencies: 3, 7
+# Priority: high
+# Description: Create FHIR resource structures and mapping from extracted data to FHIR-compliant formats for healthcare interoperability.
+# Details:
+Create Python FHIR module:
+```python
+# aide_extension/healthcare/fhir.py
+from fhir.resources import construct_fhir_element
+from fhir.resources.patient import Patient
+from fhir.resources.condition import Condition
+from fhir.resources.observation import Observation
+from fhir.resources.medicationstatement import MedicationStatement
+
+class FHIRMapper:
+    def __init__(self, config=None):
+        self.config = config or {}
+    
+    def map_to_fhir(self, extracted_data, resource_type):
+        """Map extracted data to FHIR resource"""
+        if resource_type == 'Patient':
+            return self._map_patient(extracted_data)
+        elif resource_type == 'Condition':
+            return self._map_condition(extracted_data)
+        elif resource_type == 'Observation':
+            return self._map_observation(extracted_data)
+        elif resource_type == 'MedicationStatement':
+            return self._map_medication(extracted_data)
+        else:
+            raise ValueError(f"Unsupported resource type: {resource_type}")
+    
+    def validate_resource(self, resource):
+        """Validate FHIR resource"""
+        # Implement validation logic
+        pass
+    
+    def _map_patient(self, data):
+        """Map data to Patient resource"""
+        patient = Patient()
+        
+        # Set patient attributes from extracted data
+        if 'name' in data:
+            patient.name = [{
+                'family': data['name'].get('family', ''),
+                'given': data['name'].get('given', [])
+            }]
+        
+        if 'birthDate' in data:
+            patient.birthDate = data['birthDate']
+        
+        if 'gender' in data:
+            patient.gender = data['gender']
+            
+        return patient
+```
+
+Create R wrapper for FHIR:
+```r
+# R/fhir.R
+map_to_fhir <- function(extracted_data, resource_type, options = list()) {
+  # Get Python bridge
+  py_bridge <- get_python_bridge()
+  
+  # Convert data to Python
+  py_data <- convert_to_python(extracted_data)
+  
+  # Call Python FHIR mapping function
+  py_resource <- py_bridge$generate_fhir(py_data, resource_type)
+  
+  # Convert to R structure
+  r_resource <- convert_from_python(py_resource)
+  
+  # Add FHIR resource class
+  class(r_resource) <- c(paste0("fhir_", tolower(resource_type)), "fhir_resource", class(r_resource))
+  
+  return(r_resource)
+}
+
+validate_fhir <- function(resource, validation_level = "basic") {
+  # Get Python bridge
+  py_bridge <- get_python_bridge()
+  
+  # Convert resource to Python
+  py_resource <- convert_to_python(resource)
+  
+  # Call Python validation function
+  validation_result <- py_bridge$validate_fhir(py_resource, validation_level)
+  
+  return(convert_from_python(validation_result))
+}
+```
+
+# Test Strategy:
+Test mapping with sample extracted data for each resource type. Validate generated resources against FHIR schemas. Test with edge cases (missing data, unusual values). Compare with reference FHIR examples. Test integration with terminology services for coded values.
+
+# Subtasks:
+## 1. Implement Core FHIR Resource Structure [pending]
+### Dependencies: None
+### Description: Design and implement the foundational FHIR resource structure that will serve as the base for all specific resource types.
+### Details:
+Create base classes for FHIR resources following R4 specification (v4.0.1). Implement core elements including id, meta, implicitRules, language, and text. Ensure proper handling of extensions, modifierExtensions, and contained resources. Develop serialization/deserialization capabilities for both JSON and XML formats. Include test cases for resource creation, validation of required fields, and proper extension handling. Comply with FHIR structural validation rules per http://hl7.org/fhir/validation.html.
+
+## 2. Implement Patient Resource Mapping [pending]
+### Dependencies: 8.1
+### Description: Develop the Patient resource implementation with complete mapping from source data to FHIR-compliant structure.
+### Details:
+Implement Patient resource according to http://hl7.org/fhir/patient.html specifications. Map demographic data including name, gender, birthDate, address, and contact information. Handle patient identifiers with proper system URIs. Implement support for managing multiple patient identifiers across systems. Create test cases covering: complete patient creation, partial data handling, proper formatting of names/addresses, and identifier validation. Ensure compliance with US Core Implementation Guide for Patient resources if applicable.
+
+## 3. Implement Clinical Resource Mapping [pending]
+### Dependencies: 8.1
+### Description: Develop implementations for clinical FHIR resources, specifically Condition and Observation, with complete mapping logic.
+### Details:
+Implement Condition resource per http://hl7.org/fhir/condition.html and Observation resource per http://hl7.org/fhir/observation.html. Create mapping logic for diagnoses to Condition resources with proper coding (ICD-10, SNOMED CT). Develop mapping for lab results, vital signs, and other clinical observations to Observation resources. Implement proper handling of quantitative values with units (UCUM compliance). Create test cases for: coding validation, quantitative observation handling, qualitative observation handling, and proper patient referencing. Ensure support for both categorical and continuous observation values.
+
+## 4. Implement Medication Resource Mapping [pending]
+### Dependencies: 8.1
+### Description: Develop implementations for medication-related FHIR resources with complete mapping from source data.
+### Details:
+Implement Medication resource per http://hl7.org/fhir/medication.html, MedicationRequest per http://hl7.org/fhir/medicationrequest.html, and MedicationStatement per http://hl7.org/fhir/medicationstatement.html. Create mapping logic for medication data including proper RxNorm coding. Implement dosage instructions handling with structured dosage representation. Develop mapping for medication status, dates, and prescriber information. Create test cases for: medication coding validation, dosage instruction parsing, medication status transitions, and proper patient/practitioner referencing. Ensure compliance with pharmacy FHIR implementation guides if applicable.
+
+## 5. Implement FHIR Validation Framework [pending]
+### Dependencies: 8.1, 8.2, 8.3, 8.4
+### Description: Develop a comprehensive validation framework to ensure all generated FHIR resources comply with the standard.
+### Details:
+Implement validation against FHIR structural rules and constraints using official FHIR validation schemas. Develop profile-based validation to check resources against applicable implementation guides. Implement business rule validation specific to the implementation context. Create test suite with positive and negative test cases for each resource type. Include validation for required fields, cardinality constraints, value set bindings, and reference integrity. Implement reporting mechanism for validation errors with clear error messages and resolution guidance. Test against the official FHIR validation service at https://validator.fhir.org/ for compliance verification.
+

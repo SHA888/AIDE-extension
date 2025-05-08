@@ -1,0 +1,113 @@
+# Task ID: 7
+# Title: Implement Named Entity Recognition for Healthcare
+# Status: pending
+# Dependencies: 3, 4
+# Priority: high
+# Description: Develop NER capabilities for healthcare and scientific entities using specialized models and terminology.
+# Details:
+Create Python NER module:
+```python
+# aide_extension/ai/ner.py
+import spacy
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+import torch
+
+class HealthcareNER:
+    def __init__(self, config=None):
+        self.config = config or {}
+        self.models = {}
+        
+        # Load default spaCy model
+        self.models['spacy'] = spacy.load(self.config.get('spacy_model', 'en_core_sci_md'))
+        
+        # Load transformer model if specified
+        if 'transformer_model' in self.config:
+            model_name = self.config['transformer_model']
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.models['transformer'] = AutoModelForTokenClassification.from_pretrained(model_name)
+    
+    def extract_entities(self, text, model_type='spacy'):
+        """Extract entities from text using specified model"""
+        if model_type == 'spacy':
+            return self._extract_spacy(text)
+        elif model_type == 'transformer':
+            return self._extract_transformer(text)
+        else:
+            raise ValueError(f"Unknown model type: {model_type}")
+    
+    def _extract_spacy(self, text):
+        """Extract entities using spaCy"""
+        doc = self.models['spacy'](text)
+        entities = []
+        
+        for ent in doc.ents:
+            entities.append({
+                'text': ent.text,
+                'label': ent.label_,
+                'start': ent.start_char,
+                'end': ent.end_char,
+                'confidence': 1.0  # spaCy doesn't provide confidence scores
+            })
+            
+        return entities
+    
+    def _extract_transformer(self, text):
+        """Extract entities using transformer model"""
+        # Implement transformer-based NER
+        pass
+```
+
+Create R wrapper for NER:
+```r
+# R/ner.R
+extract_healthcare_entities <- function(text, model_type = "spacy", options = list()) {
+  # Get Python bridge
+  py_bridge <- get_python_bridge()
+  
+  # Call Python NER function
+  py_entities <- py_bridge$extract_entities(text, model_type)
+  
+  # Convert to R structure
+  r_entities <- convert_from_python(py_entities)
+  
+  # Add entity class
+  class(r_entities) <- c("aide_entities", class(r_entities))
+  
+  return(r_entities)
+}
+```
+
+# Test Strategy:
+Test with medical texts containing known entities. Evaluate precision and recall against manually annotated corpus. Compare performance between different model types. Test with domain-specific terminology. Measure confidence score correlation with accuracy.
+
+# Subtasks:
+## 1. spaCy Model Integration and Configuration [pending]
+### Dependencies: None
+### Description: Set up and configure spaCy models for healthcare NER
+### Details:
+Select appropriate spaCy models (en_core_sci_lg recommended). Configure entity recognition parameters including threshold settings. Implement pipeline components for medical terminology. Evaluate using precision/recall on standard medical corpora (i2b2, MIMIC). Benchmark performance against baseline models. Document model selection criteria including vocabulary coverage of medical terms.
+
+## 2. Transformer Model Integration [pending]
+### Dependencies: 7.1
+### Description: Integrate specialized transformer models for healthcare entity recognition
+### Details:
+Select appropriate biomedical transformer models (BioBERT, ClinicalBERT, or PubMedBERT). Implement token classification heads for specialized entity types. Configure model parameters for optimal performance on medical text. Establish evaluation framework using F1 scores on specialized entities. Implement model caching to optimize performance. Document transformer model selection criteria and hyperparameter choices.
+
+## 3. Entity Extraction and Confidence Scoring [pending]
+### Dependencies: 7.1, 7.2
+### Description: Develop mechanisms for entity extraction with confidence metrics
+### Details:
+Implement entity extraction pipeline combining spaCy and transformer outputs. Develop confidence scoring algorithm based on model probabilities. Create entity normalization functions for consistent output formatting. Implement conflict resolution when models disagree on entity boundaries. Evaluate using ROC curves and AUC metrics. Document confidence score calculation methodology and thresholds.
+
+## 4. Healthcare-Specific Entity Processing [pending]
+### Dependencies: 7.3
+### Description: Implement specialized processing for healthcare-specific entities
+### Details:
+Develop custom processors for medical entities (medications, conditions, procedures, lab values). Implement context detection for negation and temporality. Create entity linking to standard medical ontologies (UMLS, SNOMED CT, RxNorm). Evaluate using domain-specific metrics including concept normalization accuracy. Document entity categorization schema and linking methodology.
+
+## 5. R Wrapper Implementation for NER [pending]
+### Dependencies: 7.4
+### Description: Create R package wrapper for the NER functionality
+### Details:
+Develop R interface using reticulate for Python interoperability. Implement R functions that mirror Python API. Create comprehensive documentation with examples. Develop unit tests for R wrapper functions. Package model artifacts for distribution. Implement error handling and logging specific to R environment. Document installation requirements and dependencies.
+
